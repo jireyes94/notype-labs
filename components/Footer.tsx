@@ -16,17 +16,18 @@ export default function Footer() {
               NOTYPE<span className="text-red-600">.</span>LABS
             </Link>
             <p className="mt-6 text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-[250px]">
-              High-end instrumentals for artists who refuse to sound like the rest. Processed in our sound laboratory.
+              Instrumentales de alta calidad, pensados para artistas que quieren sonar diferente. <br/>
+              Sonido procesado en nuestro laboratorio.
             </p>
           </div>
 
           {/* Columna 2: Navegación */}
           <div>
-            <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Navigation</h4>
+            <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Navegacion</h4>
             <ul className="space-y-4">
               <li><Link href="/" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Beats</Link></li>
-              <li><Link href="/licenses" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Licensing</Link></li>
-              <li><Link href="/contact" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Contact</Link></li>
+              <li><Link href="/licenses" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Licencias</Link></li>
+              <li><Link href="/contact" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Contacto</Link></li>
             </ul>
           </div>
 
@@ -34,15 +35,15 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Legal</h4>
             <ul className="space-y-4">
-              <li><Link href="/terms" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/refund" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Refund Policy</Link></li>
+              <li><Link href="/terms" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Terminos</Link></li>
+              <li><Link href="/privacy" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Politica de privacidad</Link></li>
+              <li><Link href="/refund" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Politica de devoluciones</Link></li>
             </ul>
           </div>
             
           {/* Columna 4: Newsletter / Social */}
           <div>
-            <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Connect</h4>
+            <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">REDES</h4>
             <div className="flex gap-4 mb-8">
               {/* INSTAGRAM */}
               <a 
@@ -70,7 +71,7 @@ export default function Footer() {
             </div>
 
             <p className="text-[9px] text-zinc-600 font-black uppercase tracking-[0.2em]">
-              © {new Date().getFullYear()} NO TYPE LABS. <br/>ALL RIGHTS RESERVED.
+              © {new Date().getFullYear()} NOTYPE LABS. <br/>ALL RIGHTS RESERVED.
             </p>
           </div>
         </div>

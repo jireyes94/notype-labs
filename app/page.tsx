@@ -124,12 +124,12 @@ function HomeContent() {
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
           
           <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16">
-            <span className="text-red-600 font-black uppercase tracking-[0.4em] text-[10px] mb-2">Exclusive Sounds</span>
+            <span className="text-red-600 font-black uppercase tracking-[0.4em] text-[10px] mb-2">Sonido Exclusivo</span>
             <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-tight max-w-2xl">
-              Elevate your <span className="text-red-600">Music</span> Quality
+              Lleva tu  <span className="text-red-600">música</span> al siguiente nivel
             </h2>
-            <p className="text-zinc-400 text-xs md:text-sm font-bold uppercase tracking-widest mt-4 max-w-md opacity-80">
-              High-quality beats for artists who don't want to sound like everyone else.
+            <p className="text-zinc-400 text-xs md:text-sm font-bold uppercase tracking-widest mt-4 max-w-md opacity-20">
+              Beats de alta calidad diseñados para artistas que no quieren sonar como el resto.
             </p>
           </div>
         </div>
@@ -141,29 +141,37 @@ function HomeContent() {
           
           {/* Fila Superior: Título y Contador */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter">
-                LATEST <span className="text-red-600">RELEASES</span>
-              </h3>
-              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">
-                {filteredBeats.length} {filteredBeats.length === 1 ? 'Instrumental disponible' : 'available beats'}
-              </p>
-            </div>
 
-            {/* Buscador Estilo Beatstars */}
+            {/* Buscador Estilo Beatstars con Botón de Borrado */}
             <div className="relative w-full md:max-w-md group">
+              {/* Icono de Lupa */}
               <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <svg className="w-4 h-4 text-zinc-500 group-focus-within:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
+
+              {/* Input */}
               <input 
                 type="text"
-                placeholder="WHAT'S YOUR VIBE TODAY?..."
+                placeholder="QUE SONIDO BUSCAS? #TAG, BPM, TITULO..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setVisibleBeats(BEATS_PER_PAGE); }}
-                className="w-full bg-zinc-900/50 border border-zinc-800 py-3.5 pl-12 pr-12 rounded-xl text-[10px] tracking-widest uppercase outline-none focus:border-red-600 focus:bg-zinc-900 transition-all"
+                className="w-full bg-zinc-900/50 border border-zinc-800 py-3.5 pl-12 pr-12 rounded-xl text-[10px] tracking-widest uppercase outline-none focus:border-red-600 focus:bg-zinc-900 transition-all shadow-inner"
               />
+
+              {/* BOTÓN PARA BORRAR (Solo visible si hay texto) */}
+              {searchTerm && (
+                <button 
+                  onClick={() => { setSearchTerm(""); setVisibleBeats(BEATS_PER_PAGE); }}
+                  className="absolute inset-y-0 right-4 flex items-center text-zinc-500 hover:text-red-600 transition-colors"
+                  title="Clear search"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
 
@@ -197,7 +205,7 @@ function HomeContent() {
               className="flex items-center gap-3 shrink-0"
             >
               <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${hideSold ? 'text-white' : 'text-zinc-600'}`}>
-                hide souldout
+                ocultar vendidos
               </span>
               <div className={`w-10 h-5 rounded-full relative transition-colors ${hideSold ? 'bg-red-600' : 'bg-zinc-800'}`}>
                 <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${hideSold ? 'left-6' : 'left-1'}`} />
