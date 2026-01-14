@@ -85,11 +85,11 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Botón de Cart unificado con estilo beats/[slug] 
+          {/* Botón de Cart unificado con estilo beats/[slug] */}
           <button className="hidden md:block bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)]">
             Cart (0)
           </button>
-          */}
+          
           {/* Admin Section */}
           {user && (
             <div className="flex items-center gap-3 border-l border-white/10 pl-6">

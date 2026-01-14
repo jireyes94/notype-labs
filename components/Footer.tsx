@@ -30,7 +30,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Columna 3: Legal 
+          {/* Columna 3: Legal */}
           <div>
             <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Legal</h4>
             <ul className="space-y-4">
@@ -39,7 +39,7 @@ export default function Footer() {
               <li><Link href="/refund" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
-            */}
+            
           {/* Columna 4: Newsletter / Social */}
           <div>
             <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Connect</h4>
