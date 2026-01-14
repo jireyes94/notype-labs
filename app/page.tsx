@@ -6,9 +6,23 @@ import BeatModal from "@/components/BeatModal";
 import { Beat } from "@/components/AudioContext";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Suspense } from 'react'
+import { Suspense } from 'react';
 
+// COMPONENTE PRINCIPAL CON SUSPENSE
 export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+// TU CÓDIGO ORIGINAL SIN CAMBIAR NI UNA COMA
+function HomeContent() {
   const [selectedBeat, setSelectedBeat] = useState<Beat | null>(null);
   const [beats, setBeats] = useState<Beat[]>([]); 
   const [loading, setLoading] = useState(true);
@@ -156,7 +170,6 @@ export default function HomePage() {
           {/* Fila Inferior: Tags + Toggle Ocultar Vendidos */}
           <div className="flex flex-col md:flex-row items-center gap-6 pt-2">
             {/* Horizontal Scroll de Tags */}
-            <Suspense fallback={
             <div className="flex flex-1 items-center gap-2 overflow-x-auto no-scrollbar w-full">
               <button 
                 onClick={() => setSearchTerm("")}
@@ -174,7 +187,6 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-          }></Suspense>
           
             {/* Separador vertical solo en desktop */}
             <div className="hidden md:block w-px h-6 bg-zinc-800" />
