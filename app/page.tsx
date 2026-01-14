@@ -156,6 +156,7 @@ export default function HomePage() {
           {/* Fila Inferior: Tags + Toggle Ocultar Vendidos */}
           <div className="flex flex-col md:flex-row items-center gap-6 pt-2">
             {/* Horizontal Scroll de Tags */}
+            <Suspense fallback={
             <div className="flex flex-1 items-center gap-2 overflow-x-auto no-scrollbar w-full">
               <button 
                 onClick={() => setSearchTerm("")}
@@ -173,7 +174,8 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-
+          }></Suspense>
+          
             {/* Separador vertical solo en desktop */}
             <div className="hidden md:block w-px h-6 bg-zinc-800" />
 
@@ -203,11 +205,9 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              <Suspense fallback={<div className="min-h-screen bg-black" />}>
               {displayedBeats.map((beat) => (
                 <BeatCard key={beat.id} beat={beat} onBuy={(b) => setSelectedBeat(b)} />
               ))}
-              </Suspense>
             </div>
           )}
 
