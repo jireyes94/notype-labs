@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="flex-grow w-full">
             {children}
           </main>
-
+          <Footer />
           {/* El reproductor ahora es el último elemento, como un footer */}
           <AudioPlayer />
         </AudioProvider>

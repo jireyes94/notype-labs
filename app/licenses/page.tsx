@@ -26,7 +26,7 @@ const licenses = [
 
 export default function LicensesPage() {
   return (
-    <div className="bg-black text-white py-20 px-6 pb-32 md:pb-24">
+    <div className="bg-black text-white py-20 px-6 pb-32 md:pb-24 min-h-screen pt-30">
       <div className="max-w-7xl mx-auto text-center mb-16">
         <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter italic mb-4">
           Licencias <span className="text-red-600">&</span> Contratos
