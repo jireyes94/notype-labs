@@ -165,7 +165,7 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
                     (Array.isArray(beatFromDB.mood) ? beatFromDB.mood : [beatFromDB.mood]).map((tag, i) => (
                       <Link 
                         key={i} 
-                        href={`/beats?search=${tag.toLowerCase()}`} // Enlace al catálogo con el tag
+                        href={`/?search=${tag.toLowerCase()}`} // Enlace al catálogo con el tag
                         className="px-4 py-1.5 bg-zinc-950/50 border border-zinc-900 rounded-lg text-[11px] font-bold text-zinc-500 hover:text-white hover:border-red-600 hover:bg-red-600/10 transition-all cursor-pointer"
                       >
                         #{tag.toLowerCase()}
