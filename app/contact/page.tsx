@@ -4,7 +4,7 @@ import { SiKick } from "react-icons/si"; // Necesitarás instalar react-icons o 
 
 export default function ContactPage() {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-black px-6 pb-40 pt-10">
+    <div className="min-h-[80vh] flex items-center justify-center bg-black px-6 pb-40 pt-30">
       <div className="max-w-5xl w-full text-center space-y-12">
         
         {/* TEXTO EXPLOSIVO */}

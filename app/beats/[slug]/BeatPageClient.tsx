@@ -95,7 +95,7 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
   if (!beatFromDB) return <div className="min-h-screen bg-black text-white flex items-center justify-center font-bold">Error.</div>;
 
   return (
-    <div className="relative min-h-[calc(100dvh-70px)] bg-black text-white flex flex-col">
+    <div className="relative min-h-screen bg-black text-white pb-32 pt-24 px-4 md:px-8">
       
       {/* FONDO: Bajamos el z-index para que NADA del fondo tape la Navbar ni el contenido */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -109,10 +109,21 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
 
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 flex flex-col flex-1 justify-center py-10 pb-40 md:pb-20">
         
-        <div className="mb-4 lg:absolute lg:top-10">
-          <Link href="/beats" className="inline-flex items-center gap-2 text-zinc-600 hover:text-white transition-colors group">
-            <span className="text-[9px] font-black uppercase tracking-[0.5em]">← CATÁLOGO</span>
-          </Link>
+        <div className="mb-4">
+          <Link 
+        href="/" 
+        className="group inline-flex items-center gap-2 mb-8 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 hover:text-red-600 transition-all"
+      >
+        <svg 
+          className="w-4 h-4 transition-transform group-hover:-translate-x-1" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span>Volver al Catálogo</span>
+      </Link>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-4 justify-between items-center w-full">

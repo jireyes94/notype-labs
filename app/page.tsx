@@ -22,7 +22,13 @@ export default function HomePage() {
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Tags sugeridos para el scroll horizontal (estilo Beatstars)
-  const suggestedTags = ["Trap", "Drill", "R&B", "Reggaeton", "Dark", "Aggressive", "Sad", "Guitar"];
+  const suggestedTags = useMemo(() => {
+    const allMoods = beats.flatMap(beat => 
+      Array.isArray(beat.mood) ? beat.mood : [beat.mood]
+    );
+    // Removemos duplicados y limitamos a los 10 más usados
+    return Array.from(new Set(allMoods)).slice(0, 10);
+  }, [beats]);
 
   useEffect(() => {
     if (querySearch) setSearchTerm(querySearch);
@@ -89,7 +95,7 @@ export default function HomePage() {
   }, [visibleBeats, filteredBeats.length]);
 
   return (
-    <main className="min-h-screen bg-black text-white pb-32">
+    <main className="min-h-screen bg-black text-white pb-32 pt-20">
       
       {/* 1. BANNER SUPERIOR (Estilo Beatstars + NO TYPE) */}
       <section className="relative w-full px-4 md:px-8 pt-6">
@@ -105,10 +111,10 @@ export default function HomePage() {
           <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16">
             <span className="text-red-600 font-black uppercase tracking-[0.4em] text-[10px] mb-2">Exclusive Sounds</span>
             <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-tight max-w-2xl">
-              Elevate your <span className="text-red-600">Music</span> Business
+              Elevate your <span className="text-red-600">Music</span> Quality
             </h2>
             <p className="text-zinc-400 text-xs md:text-sm font-bold uppercase tracking-widest mt-4 max-w-md opacity-80">
-              Beats de alta calidad para artistas que no buscan sonar como el resto.
+              High-quality beats for artists who don't want to sound like everyone else.
             </p>
           </div>
         </div>
@@ -122,10 +128,10 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter">
-                Top <span className="text-red-600">Charts</span>
+                LATEST <span className="text-red-600">RELEASES</span>
               </h3>
               <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">
-                {filteredBeats.length} {filteredBeats.length === 1 ? 'Instrumental disponible' : 'Instrumentales disponibles'}
+                {filteredBeats.length} {filteredBeats.length === 1 ? 'Instrumental disponible' : 'available beats'}
               </p>
             </div>
 
@@ -138,7 +144,7 @@ export default function HomePage() {
               </div>
               <input 
                 type="text"
-                placeholder="BUSCAR BEATS, TAGS O BPM..."
+                placeholder="WHAT'S YOUR VIBE TODAY?..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setVisibleBeats(BEATS_PER_PAGE); }}
                 className="w-full bg-zinc-900/50 border border-zinc-800 py-3.5 pl-12 pr-12 rounded-xl text-[10px] tracking-widest uppercase outline-none focus:border-red-600 focus:bg-zinc-900 transition-all"
@@ -176,7 +182,7 @@ export default function HomePage() {
               className="flex items-center gap-3 shrink-0"
             >
               <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${hideSold ? 'text-white' : 'text-zinc-600'}`}>
-                Ocultar vendidos
+                hide souldout
               </span>
               <div className={`w-10 h-5 rounded-full relative transition-colors ${hideSold ? 'bg-red-600' : 'bg-zinc-800'}`}>
                 <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${hideSold ? 'left-6' : 'left-1'}`} />

@@ -158,7 +158,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-70px)] bg-black text-white flex flex-col pt-6 md:pt-10 overflow-y-auto lg:overflow-hidden">
+    <div className="relative min-h-screen bg-black text-white pt-30">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 w-full flex-1 px-6 pb-10">
         
         {/* PANEL IZQUIERDO: FORMULARIO */}
