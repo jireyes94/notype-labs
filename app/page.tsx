@@ -6,6 +6,7 @@ import BeatModal from "@/components/BeatModal";
 import { Beat } from "@/components/AudioContext";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from 'react'
 
 export default function HomePage() {
   const [selectedBeat, setSelectedBeat] = useState<Beat | null>(null);
@@ -202,9 +203,11 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              <Suspense fallback={<div className="min-h-screen bg-black" />}>
               {displayedBeats.map((beat) => (
                 <BeatCard key={beat.id} beat={beat} onBuy={(b) => setSelectedBeat(b)} />
               ))}
+              </Suspense>
             </div>
           )}
 
