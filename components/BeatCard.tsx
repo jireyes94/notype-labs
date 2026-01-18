@@ -7,8 +7,8 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
   const isThisBeatActive = currentBeat?.slug === beat.slug && isPlaying;
 
   return (
-    <Link 
-      href={`/beats/${beat.slug}`}
+    <div 
+      onClick={() => { if (!beat.is_sold) onBuy(beat); }} // <-- AHORA TODA LA CARD ABRE EL MODAL
       className={`bg-zinc-950 rounded-2xl border border-zinc-900 overflow-hidden hover:border-red-600/50 transition-all group flex flex-col h-full shadow-lg relative cursor-pointer max-w-[300px] mx-auto w-full ${beat.is_sold ? 'opacity-80' : ''}`}
     >
       {/* ETIQUETA SOLD */}
@@ -34,6 +34,7 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
         }`}>
           <button 
             onClick={(e) => {
+              e.stopPropagation();
               e.preventDefault(); 
               playBeat(beat);
             }}
@@ -92,6 +93,6 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
           </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

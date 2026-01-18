@@ -136,7 +136,7 @@ function HomeContent() {
       </section>
 
       {/* 2. BARRA DE CONTROL (BUSCADOR + TAGS + COUNTER) */}
-      <div className="sticky top-[72px] z-[40] bg-black/80 backdrop-blur-xl border-b border-zinc-900/50 py-6 px-4 md:px-8 mt-8">
+      <div className="z-[40] bg-black/80 backdrop-blur-xl border-b border-zinc-900/50 py-6 px-4 md:px-8 mt-8">
         <div className="max-w-[1600px] mx-auto space-y-6">
           
           {/* Fila Superior: Título y Contador */}
