@@ -75,22 +75,6 @@ export default function Footer() {
             </p>
           </div>
         </div>
-
-        {/* Texto Grande de Fondo (Estilo Diseño Moderno) */}
-        <div className="pointer-events-none select-none w-full overflow-hidden mt-10 md:mt-20 flex justify-center items-center px-4">
-          <h2 className="
-            text-[9vw] 
-            sm:text-[9vw]
-            md:text-[9vw] 
-            font-black uppercase italic tracking-tighter 
-            leading-none text-zinc-900/25
-            text-center 
-            max-w-full
-            break-words
-          ">
-            — NOTYPE LABS —
-          </h2>
-        </div>
       </div>
     </footer>
   );
