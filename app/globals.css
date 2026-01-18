@@ -12,14 +12,12 @@ html, body {
   margin: 0;
   padding: 0;
   background-color: #000000;
-  overflow-x: hidden;
   overscroll-behavior-y: none;
 }
 
 /* Scroll normal */
 body {
   overflow-y: auto;
-  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 

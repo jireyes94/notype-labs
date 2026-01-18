@@ -65,15 +65,6 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
           <h2 className="block font-black text-lg md:text-xl text-white group-hover:text-red-600 transition-colors truncate uppercase tracking-tighter italic">
             {beat.title}
           </h2>
-          
-          {/* HASHTAGS AGRANDADOS SIN BOLD */}
-          <div className="flex flex-wrap gap-2">
-            {(Array.isArray(beat.mood) ? beat.mood : [beat.mood]).map((tag, i) => (
-              <span key={i} className="text-zinc-500 text-[12px] font-medium lowercase tracking-tight">
-                #{tag}
-              </span>
-            ))}
-          </div>
         </div>
         
         {/* FOOTER - CORREGIDO PARA MOBILE */}
