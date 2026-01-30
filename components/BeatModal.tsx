@@ -69,7 +69,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
       {/* SIDEBAR PANEL */}
       <div className={`
         relative bg-[#050505] w-full md:w-[450px] h-full shadow-2xl border-l border-white/5 
-        flex flex-col transition-transform duration-500 ease-out animate-slide-left pb-32 md:pb-40
+        flex flex-col transition-transform duration-500 ease-out animate-slide-left
       `}>
 
         {/* FONDO DESENFOCADO (Estilo BeatPageClient) */}
@@ -99,14 +99,14 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar p-8">
+        <div className="flex-1 overflow-y-auto no-scrollbar p-8 pb-44">
           {/* ARTE Y TÍTULO (Estilo BeatPageClient) */}
           <div className="flex flex-col items-center">
             <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
               <img src={beat.cover_url} alt={beat.title} className="w-full h-full object-cover" />
               <button 
                 onClick={() => playBeat(beat)}
-                className="absolute inset-0 m-auto w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
+                className="absolute inset-0 m-auto w-15 h-15 bg-red-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
               >
                 {currentBeat?.id === beat.id && isPlaying ? 
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg> :
@@ -128,22 +128,21 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
                 <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none mb-4">{beat.title}</h2>
                 <div className="flex items-center gap-6">
                   <div className="flex flex-col">
-                    <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Frecuencia</span>
+                    <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Tempo</span>
                     <span className="text-sm font-bold">{beat.bpm} BPM</span>
                   </div>
                   <div className="flex flex-col border-l border-white/10 pl-6">
-                    <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Tonalidad</span>
-                    <span className="text-sm font-bold text-red-600">{beat.key}</span>
+                    <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Key</span>
+                    <span className="text-sm font-bold">{beat.key}</span>
                   </div>
                 </div>
               </>
             )}
           </div>
-
           {/* LICENCIAS (Cuerpo de Sidebar) */}
-          <div className="space-y-2">
+          <div className="space-y-2 mt-6">
             <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 mb-4">Seleccionar Licencia</h3>
-            
+
             {[
               { id: "MP3", name: "MP3 Standard", desc: "Uso básico / Streaming limitado", p: mp3Price },
               { id: "WAV", name: "WAV Premium", desc: "Alta calidad / Uso comercial", p: wavPrice },
