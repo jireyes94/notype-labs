@@ -5,6 +5,8 @@ import { useAudio, Beat } from "@/components/AudioContext";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
 export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
   const { playBeat, currentBeat } = useAudio();

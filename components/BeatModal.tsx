@@ -3,8 +3,13 @@ import { useEffect, useState } from "react";
 import { useAudio, Beat } from "./AudioContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+
+// Inicialización de MP (Fuera del componente para evitar re-inicializaciones)
+initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
 export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () => void }) {
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const { playBeat, currentBeat, isPlaying } = useAudio();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +30,6 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
       if (session) setIsAdmin(true);
     };
     checkAdmin();
-    // Bloquear scroll del body al abrir
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = 'auto'; };
   }, []);
@@ -51,10 +55,36 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
     setLoading(false);
   };
 
-  const buy = (license: string, price: number) => {
-    const phoneNumber = "5492214379913";
-    const msg = encodeURIComponent(`Hola! Me contacto para adquirir la licencia *${license}* de *${beat.title}* por un valor de $${price.toLocaleString('es-AR')}.`);
-    window.open(`https://wa.me/${phoneNumber}?text=${msg}`, '_blank');
+  // Función de compra refactorizada
+  const buy = async (license: string) => {
+    try {
+      setPreferenceId(null); // Resetear estado previo
+      setLoading(true);
+      
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          beat: beat, 
+          licenseType: license 
+        }),
+      });
+
+      if (!res.ok) throw new Error("Error en la respuesta del servidor");
+
+      const data = await res.json();
+      
+      if (data.id) {
+        setPreferenceId(data.id);
+      }
+    } catch (error) {
+      console.error("Error al iniciar checkout:", error);
+      alert("Hubo un error al conectar con Mercado Pago. Intenta nuevamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const mp3Price = beat.price;
@@ -63,26 +93,18 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
 
   return (
     <div className="fixed inset-0 z-[200] flex justify-end">
-      {/* Overlay - Se cierra al hacer click fuera */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose} />
 
-      {/* SIDEBAR PANEL */}
       <div className={`
         relative bg-[#050505] w-full md:w-[450px] h-full shadow-2xl border-l border-white/5 
         flex flex-col transition-transform duration-500 ease-out animate-slide-left
       `}>
 
-        {/* FONDO DESENFOCADO (Estilo BeatPageClient) */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-60">
-           <img 
-            src={beat.cover_url} 
-            alt="" 
-            className="w-full h-full object-cover blur-[50px] scale-120"
-           />
+           <img src={beat.cover_url} alt="" className="w-full h-full object-cover blur-[50px] scale-120" />
            <div className="absolute inset-0 bg-gradient-to-b from-black via-black/40 to-black" />
         </div>
         
-        {/* HEADER: Close & Admin Toggle */}
         <div className="p-6 flex justify-between items-center border-b border-white/5">
           <button onClick={onClose} className="group flex items-center gap-2 text-zinc-500 hover:text-white transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -90,24 +112,17 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
           </button>
           
           {isAdmin && (
-            <button 
-              onClick={() => setIsEditing(!isEditing)}
-              className="text-[9px] font-black uppercase tracking-widest px-4 py-2 bg-white text-black rounded-full hover:bg-red-600 hover:text-white transition-all"
-            >
+            <button onClick={() => setIsEditing(!isEditing)} className="text-[9px] font-black uppercase tracking-widest px-4 py-2 bg-white text-black rounded-full hover:bg-red-600 hover:text-white transition-all">
               {isEditing ? "Ver Vista Previa" : "Editar Datos"}
             </button>
           )}
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar p-8 pb-44">
-          {/* ARTE Y TÍTULO (Estilo BeatPageClient) */}
           <div className="flex flex-col items-center">
             <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
               <img src={beat.cover_url} alt={beat.title} className="w-full h-full object-cover" />
-              <button 
-                onClick={() => playBeat(beat)}
-                className="absolute inset-0 m-auto w-15 h-15 bg-red-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform"
-              >
+              <button onClick={() => playBeat(beat)} className="absolute inset-0 m-auto w-15 h-15 bg-red-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
                 {currentBeat?.id === beat.id && isPlaying ? 
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg> :
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -116,7 +131,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
             </div>
 
             {isEditing ? (
-              <div className="space-y-4">
+              <div className="space-y-4 w-full mt-4">
                 <input className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-xl font-black italic" value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
                 <div className="grid grid-cols-2 gap-4">
                   <input className="bg-white/5 border border-white/10 p-3 rounded-xl text-xs uppercase" value={editData.bpm} onChange={e => setEditData({...editData, bpm: e.target.value})} placeholder="BPM" />
@@ -124,24 +139,24 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
                 </div>
               </div>
             ) : (
-              <>
+              <div className="text-center mt-4">
                 <h2 className="text-4xl font-black uppercase italic tracking-tighter leading-none mb-4">{beat.title}</h2>
-                <div className="flex items-center gap-6">
-                  <div className="flex flex-col">
+                <div className="flex items-center justify-center gap-6">
+                  <div className="flex flex-col items-center">
                     <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Tempo</span>
                     <span className="text-sm font-bold">{beat.bpm} BPM</span>
                   </div>
-                  <div className="flex flex-col border-l border-white/10 pl-6">
+                  <div className="flex flex-col items-center border-l border-white/10 pl-6">
                     <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest">Key</span>
                     <span className="text-sm font-bold">{beat.key}</span>
                   </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
-          {/* LICENCIAS (Cuerpo de Sidebar) */}
-          <div className="space-y-2 mt-6">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 mb-4">Seleccionar Licencia</h3>
+
+          <div className="space-y-2 mt-10">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 mb-4 text-center">Seleccionar Licencia</h3>
 
             {[
               { id: "MP3", name: "MP3 Standard", desc: "Uso básico / Streaming limitado", p: mp3Price },
@@ -150,8 +165,12 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
             ].map((lic) => (
               <button 
                 key={lic.id}
-                onClick={() => buy(lic.name, lic.p)}
-                className="w-full group flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5rem] hover:bg-white/[0.07] hover:border-red-600/50 transition-all"
+                disabled={loading}
+                onClick={() => buy(lic.name)}
+                className={`w-full group flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5rem] transition-all
+                  ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/[0.07] hover:border-red-600/50'}
+                  ${preferenceId && 'opacity-30'}
+                `}
               >
                 <div className="text-left">
                   <p className="text-xs font-black uppercase tracking-widest group-hover:text-red-500 transition-colors">{lic.name}</p>
@@ -161,14 +180,37 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
               </button>
             ))}
           </div>
+
+          {/* ÁREA DE PAGO MERCADO PAGO */}
+          <div className="mt-8">
+            {loading && (
+              <div className="flex flex-col items-center justify-center p-4 gap-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-red-600"></div>
+                <p className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Generando orden...</p>
+              </div>
+            )}
+          
+            {preferenceId && (
+              <div className="animate-fade-in bg-white p-6 rounded-[2rem] shadow-2xl">
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-black text-[10px] font-black uppercase tracking-widest">
+                    Pagar con Mercado Pago
+                  </p>
+                  <button onClick={() => setPreferenceId(null)} className="text-black hover:text-red-600">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <Wallet 
+                  initialization={{ preferenceId }} 
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes slide-left {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
+        @keyframes slide-left { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .animate-slide-left { animation: slide-left 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
