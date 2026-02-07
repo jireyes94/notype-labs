@@ -9,6 +9,7 @@ import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
 export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () => void }) {
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://notypelabs.vercel.app';
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const { playBeat, currentBeat, isPlaying } = useAudio();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -210,6 +211,11 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
                     visual: {
                       buttonBackground: 'black',
                       borderRadius: '16px',
+                    },
+                    backUrls: {
+                      success: `${baseUrl}/success`,
+                      error: `${baseUrl}/`,
+                      pending: `${baseUrl}/`
                     }
                   } as any} // Esto soluciona el error de "visual" no existente
                 />
