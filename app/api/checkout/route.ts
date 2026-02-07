@@ -24,7 +24,8 @@ export async function POST(request: Request) {
             currency_id: "ARS",
           }
         ],
-        // IMPORTANTE: Metadata fuera y dentro para asegurar persistencia
+        // REQUISITO DOCUMENTACIÓN WALLET BRICK:
+        purpose: 'wallet_purchase', 
         metadata: {
           beat_id: beat.id,
           license_type: licenseType,
@@ -32,12 +33,8 @@ export async function POST(request: Request) {
         back_urls: {
           success: `${process.env.NEXT_PUBLIC_URL}/success`,
           failure: `${process.env.NEXT_PUBLIC_URL}/`,
-          pending: `${process.env.NEXT_PUBLIC_URL}/`,
         },
         auto_return: "approved",
-        // Aseguramos que la URL sea absoluta y correcta
-        notification_url: `${process.env.NEXT_PUBLIC_URL}/api/webhooks/mercadopago`,
-        statement_descriptor: "NOTYPELABS",
       },
     });
 
