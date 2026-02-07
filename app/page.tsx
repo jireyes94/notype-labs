@@ -112,109 +112,112 @@ function HomeContent() {
   return (
     <main className="min-h-screen bg-black text-white pb-32 pt-20">
       
-      {/* 1. BANNER SUPERIOR (Estilo Beatstars + NO TYPE) */}
-      <section className="relative w-full px-4 md:px-8 pt-6">
-        <div className="max-w-[1600px] mx-auto relative h-[250px] md:h-[350px] rounded-[2rem] overflow-hidden border border-zinc-900 shadow-2xl group">
-          {/* Imagen de fondo relacionada a producción */}
+      {/* 1. HERO SECTION INMERSIVO */}
+      <section className="relative w-full">
+        {/* Contenedor de Imagen de Fondo - Ocupa hasta los tags */}
+        <div className="absolute inset-0 h-[600px] md:h-[700px] overflow-hidden">
           <img 
             src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop" 
-            className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover opacity-40"
             alt="Studio Background"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
-          
-          <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-16">
-            <span className="text-red-600 font-black uppercase tracking-[0.4em] text-[10px] mb-2">Sonido Exclusivo</span>
-            <h2 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-tight max-w-2xl">
-              Lleva tu  <span className="text-red-600">música</span> al siguiente nivel
+          {/* Degradados para legibilidad y suavizado */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
+        </div>
+
+        {/* Contenido del Hero */}
+        <div className="relative max-w-[1600px] mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-10">
+          <div className="flex flex-col justify-center min-h-[300px] md:min-h-[400px]">
+            <span className="text-red-600 font-black uppercase tracking-[0.5em] text-[10px] md:text-xs mb-4 drop-shadow-md">
+              Sonido Exclusivo
+            </span>
+            <h2 className="text-5xl md:text-8xl lg:text-9xl font-black uppercase italic tracking-tighter leading-[0.9] max-w-4xl drop-shadow-2xl">
+              Lleva tu <br /> 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500">música</span> <br />
+              <span className="text-white">al siguiente nivel</span>
             </h2>
-            <p className="text-zinc-400 text-xs md:text-sm font-bold uppercase tracking-widest mt-4 max-w-md opacity-20">
-              Beats de alta calidad diseñados para artistas que no quieren sonar como el resto.
-            </p>
+          </div>
+        </div>
+
+        {/* 2. BARRA DE CONTROL (Integrada sobre el Hero) */}
+        <div className="relative z-[40] px-4 md:px-8">
+          <div className="max-w-[1600px] mx-auto">
+            <div className="bg-black/40 backdrop-blur-md border border-zinc-800/50 p-6 md:p-8 rounded-3xl shadow-2xl">
+              <div className="space-y-6">
+                
+                {/* Fila Superior: Buscador */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                  <div className="relative w-full md:max-w-xl group">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-zinc-500 group-focus-within:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+
+                    <input 
+                      type="text"
+                      placeholder="QUE SONIDO BUSCAS? #TAG, BPM, TITULO..."
+                      value={searchTerm}
+                      onChange={(e) => { setSearchTerm(e.target.value); setVisibleBeats(BEATS_PER_PAGE); }}
+                      className="w-full bg-black/60 border border-zinc-700/50 py-4 pl-14 pr-12 rounded-2xl text-[11px] tracking-[0.2em] uppercase outline-none focus:border-red-600 focus:bg-black transition-all shadow-2xl"
+                    />
+
+                    {searchTerm && (
+                      <button 
+                        onClick={() => { setSearchTerm(""); setVisibleBeats(BEATS_PER_PAGE); }}
+                        className="absolute inset-y-0 right-4 flex items-center text-zinc-500 hover:text-red-600 transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Línea divisoria interna estética */}
+                <div className="h-px w-full bg-gradient-to-r from-zinc-800/50 via-zinc-700/50 to-transparent" />
+
+                {/* Fila Inferior: Tags + Toggle */}
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="flex flex-1 items-center gap-3 overflow-x-auto no-scrollbar w-full">
+                    <button 
+                      onClick={() => setSearchTerm("")}
+                      className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${searchTerm === "" ? 'bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-zinc-900/80 text-zinc-400 hover:text-white border border-zinc-800'}`}
+                    >
+                      All
+                    </button>
+                    {suggestedTags.map(tag => (
+                      <button 
+                        key={tag}
+                        onClick={() => setSearchTerm(tag)}
+                        className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border whitespace-nowrap ${searchTerm.toLowerCase() === tag.toLowerCase() ? 'bg-red-600 border-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]' : 'bg-transparent border-zinc-800 text-zinc-500 hover:border-zinc-400 hover:text-white'}`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                
+                  <div className="hidden md:block w-px h-8 bg-zinc-800" />
+
+                  <button 
+                    onClick={() => setHideSold(!hideSold)}
+                    className="flex items-center gap-4 shrink-0 group"
+                  >
+                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${hideSold ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-300'}`}>
+                      ocultar vendidos
+                    </span>
+                    <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${hideSold ? 'bg-red-600' : 'bg-zinc-800'}`}>
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${hideSold ? 'left-7' : 'left-1'}`} />
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* 2. BARRA DE CONTROL (BUSCADOR + TAGS + COUNTER) */}
-      <div className="z-[40] bg-black/80 backdrop-blur-xl border-b border-zinc-900/50 py-6 px-4 md:px-8 mt-8">
-        <div className="max-w-[1600px] mx-auto space-y-6">
-          
-          {/* Fila Superior: Título y Contador */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-
-            {/* Buscador Estilo Beatstars con Botón de Borrado */}
-            <div className="relative w-full md:max-w-md group">
-              {/* Icono de Lupa */}
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <svg className="w-4 h-4 text-zinc-500 group-focus-within:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-
-              {/* Input */}
-              <input 
-                type="text"
-                placeholder="QUE SONIDO BUSCAS? #TAG, BPM, TITULO..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setVisibleBeats(BEATS_PER_PAGE); }}
-                className="w-full bg-zinc-900/50 border border-zinc-800 py-3.5 pl-12 pr-12 rounded-xl text-[10px] tracking-widest uppercase outline-none focus:border-red-600 focus:bg-zinc-900 transition-all shadow-inner"
-              />
-
-              {/* BOTÓN PARA BORRAR (Solo visible si hay texto) */}
-              {searchTerm && (
-                <button 
-                  onClick={() => { setSearchTerm(""); setVisibleBeats(BEATS_PER_PAGE); }}
-                  className="absolute inset-y-0 right-4 flex items-center text-zinc-500 hover:text-red-600 transition-colors"
-                  title="Clear search"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Fila Inferior: Tags + Toggle Ocultar Vendidos */}
-          <div className="flex flex-col md:flex-row items-center gap-6 pt-2">
-            {/* Horizontal Scroll de Tags */}
-            <div className="flex flex-1 items-center gap-2 overflow-x-auto no-scrollbar w-full">
-              <button 
-                onClick={() => setSearchTerm("")}
-                className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${searchTerm === "" ? 'bg-red-600 text-white' : 'bg-zinc-900 text-zinc-500 hover:text-white border border-zinc-800'}`}
-              >
-                All
-              </button>
-              {suggestedTags.map(tag => (
-                <button 
-                  key={tag}
-                  onClick={() => setSearchTerm(tag)}
-                  className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border whitespace-nowrap ${searchTerm.toLowerCase() === tag.toLowerCase() ? 'bg-red-600 border-red-600 text-white' : 'bg-transparent border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white'}`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          
-            {/* Separador vertical solo en desktop */}
-            <div className="hidden md:block w-px h-6 bg-zinc-800" />
-
-            {/* Toggle Switch */}
-            <button 
-              onClick={() => setHideSold(!hideSold)}
-              className="flex items-center gap-3 shrink-0"
-            >
-              <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${hideSold ? 'text-white' : 'text-zinc-600'}`}>
-                ocultar vendidos
-              </span>
-              <div className={`w-10 h-5 rounded-full relative transition-colors ${hideSold ? 'bg-red-600' : 'bg-zinc-800'}`}>
-                <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${hideSold ? 'left-6' : 'left-1'}`} />
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* 3. GRILLA DE CONTENIDO */}
       <section className="px-4 md:px-8 mt-10">
         <div className="max-w-[1600px] mx-auto">
