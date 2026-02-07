@@ -1,8 +1,9 @@
-// app/success/page.tsx
 'use client';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react'; // 1. Importamos Suspense
 
-export default function SuccessPage() {
+// 2. Movemos tu lógica a un componente interno
+function SuccessContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('payment_id');
 
@@ -22,5 +23,14 @@ export default function SuccessPage() {
 
       <a href="/" className="mt-6 text-zinc-600 text-[9px] uppercase font-black hover:text-white transition-colors">Volver a la tienda</a>
     </div>
+  );
+}
+
+// 3. El export principal solo envuelve lo de arriba en Suspense
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">Cargando...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }
