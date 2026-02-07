@@ -77,14 +77,20 @@ export async function GET(request: Request) {
       { responseType: "stream" }
     );
 
-    const nodeStream = fileResponse.data as Readable;
+    // --- CAMBIO AQUÍ PARA EVITAR ARCHIVO CORRUPTO ---
+    // Convertimos el stream de Node a un formato que Next.js entienda perfectamente
+    const chunks = [];
+    for await (const chunk of fileResponse.data) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
     
-    // 7. Retornar el archivo para descarga directa
-    return new NextResponse(nodeStream as any, {
+    // 7. Retornar el archivo usando un Buffer (más estable para archivos pequeños/medianos)
+    return new NextResponse(buffer, {
       headers: {
         "Content-Disposition": `attachment; filename="Beat_${beatId}_${licenseType.toString().replace(/\s+/g, '_')}.zip"`,
-        "Content-Type": "application/octet-stream",
-        "Cache-Control": "no-store, max-age=0",
+        "Content-Type": "application/zip", // Cambiamos a zip específico
+        "Content-Length": buffer.length.toString(),
       },
     });
 
