@@ -3,14 +3,17 @@ import { useEffect, useState } from "react";
 import { useAudio, Beat } from "./AudioContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 
-// Inicialización de MP (Fuera del componente para evitar re-inicializaciones)
 initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
 export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () => void }) {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://notypelabs.vercel.app';
+  const [showPaymentBrick, setShowPaymentBrick] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [selectedLicenseName, setSelectedLicenseName] = useState<string | null>(null);
+  const [selectedAmount, setSelectedAmount] = useState<number>(0);
+
   const { playBeat, currentBeat, isPlaying } = useAudio();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -56,36 +59,81 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
     setLoading(false);
   };
 
-  // Función de compra refactorizada
-  const buy = async (license: string) => {
+  const buy = async (license: string, price: number) => {
+    setLoading(true);
+    setPreferenceId(null);
+    setShowPaymentBrick(false);
+    setSelectedLicenseName(license);
+    setSelectedAmount(price);
+
     try {
-      setPreferenceId(null); // Resetear estado previo
-      setLoading(true);
-      
-      const res = await fetch("/api/checkout", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          beat: beat, 
+          action: "create_preference", 
+          beatId: beat.id, 
           licenseType: license 
         }),
       });
-
-      if (!res.ok) throw new Error("Error en la respuesta del servidor");
-
-      const data = await res.json();
+      const data = await response.json();
+      setPreferenceId(data.id);
+      setShowPaymentBrick(true);
       
-      if (data.id) {
-        setPreferenceId(data.id);
-      }
+      setTimeout(() => {
+        const container = document.getElementById('payment-area');
+        container?.scrollIntoView({ behavior: 'smooth'});
+      }, 100);
     } catch (error) {
-      console.error("Error al iniciar checkout:", error);
-      alert("Hubo un error al conectar con Mercado Pago. Intenta nuevamente.");
+      console.error("Error al crear preferencia:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const initialization = {
+    amount: selectedAmount,
+    preferenceId: preferenceId!, // CRUCIAL para mostrar MP
+  };
+
+  const customization = {
+    paymentMethods: {
+      creditCard: "all" as const,
+      debitCard: "all" as const,
+      mercadoPago: "all" as const,
+      bankTransfer: "all" as const, // Agregado para las 4 opciones
+    },
+    visual: {
+      style: {
+        theme: 'dark' as const,
+      }
+    }
+  };
+
+  const onSubmit = async ({ selectedPaymentMethod, formData }: any) => {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            formData,
+            beatId: beat.id,
+            licenseType: selectedLicenseName,
+          }),
+        });
+
+        if (res.ok) {
+          router.push('/success');
+          resolve();
+        } else {
+          throw new Error("Error en el pago");
+        }
+      } catch (error) {
+        console.error(error);
+        reject();
+      }
+    });
   };
 
   const mp3Price = beat.price;
@@ -167,10 +215,10 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
               <button 
                 key={lic.id}
                 disabled={loading}
-                onClick={() => buy(lic.name)}
+                onClick={() => buy(lic.name, lic.p)}
                 className={`w-full group flex items-center justify-between p-6 bg-white/[0.03] border border-white/5 rounded-[1.5rem] transition-all
                   ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/[0.07] hover:border-red-600/50'}
-                  ${preferenceId && 'opacity-30'}
+                  ${showPaymentBrick && selectedLicenseName === lic.name ? 'border-red-600 bg-white/[0.08]' : ''}
                 `}
               >
                 <div className="text-left">
@@ -182,42 +230,29 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
             ))}
           </div>
 
-          {/* ÁREA DE PAGO MERCADO PAGO */}
-          <div className="mt-8">
-            {loading && (
-              <div className="flex flex-col items-center justify-center p-4 gap-3">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-red-600"></div>
-                <p className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Generando orden...</p>
-              </div>
-            )}
-          
-            {preferenceId && (
-              <div id="walletBrick_container" className="animate-fade-in bg-white p-6 rounded-[2rem] shadow-2xl">
-                <div className="flex justify-between items-center mb-4">
-                  <p className="text-black text-[10px] font-black uppercase tracking-widest">
-                    Finalizar Compra
-                  </p>
-                  <button onClick={() => setPreferenceId(null)} className="text-black hover:text-red-600">
+          <div id="payment-area" className="mt-8 scroll-mt-24">
+            {showPaymentBrick && preferenceId && (
+              <div className="animate-fade-in bg-zinc-900/50 border border-white/10 p-2 rounded-[2rem] shadow-2xl">
+                <div className="flex justify-between items-center p-4">
+                  <div>
+                    <p className="text-white text-[10px] font-black uppercase tracking-widest">
+                      Checkout Seguro
+                    </p>
+                    <p className="text-zinc-500 text-[8px] uppercase font-bold tracking-wider">
+                      {selectedLicenseName} • ${selectedAmount.toLocaleString('es-AR')}
+                    </p>
+                  </div>
+                  <button onClick={() => setShowPaymentBrick(false)} className="text-zinc-500 hover:text-red-600 transition-colors">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
                   </button>
                 </div>
 
-                <Wallet 
-                  initialization={{ 
-                    preferenceId: preferenceId,
-                    redirectMode: 'modal' as any // Esto soluciona el error de "blank" | "self"
-                  }}
-                  customization={{
-                    visual: {
-                      buttonBackground: 'black',
-                      borderRadius: '16px',
-                    },
-                    backUrls: {
-                      success: `${baseUrl}/success`,
-                      error: `${baseUrl}/`,
-                      pending: `${baseUrl}/`
-                    }
-                  } as any} // Esto soluciona el error de "visual" no existente
+                <Payment 
+                  initialization={initialization}
+                  customization={customization}
+                  onSubmit={onSubmit}
+                  onError={(error) => console.error(error)}
+                  onReady={() => setLoading(false)}
                 />
               </div>
             )}
