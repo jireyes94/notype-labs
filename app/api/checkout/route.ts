@@ -35,6 +35,13 @@ export async function POST(request: Request) {
             unit_price: finalPrice,
             currency_id: "ARS",
           }],
+          // REDIRECCIONES OBLIGATORIAS PARA EL FLUJO DE BILLETERA (WALLET)
+          back_urls: {
+            success: `${process.env.NEXT_PUBLIC_URL}/success`,
+            failure: `${process.env.NEXT_PUBLIC_URL}/`,
+            pending: `${process.env.NEXT_PUBLIC_URL}/`,
+          },
+          auto_return: "approved",
           metadata: {
             beat_id: beatId.toString(),
             license_type: licenseType,
@@ -45,8 +52,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ id: preference.id });
     }
 
-    // Caso B: El Brick envía los datos del formulario para procesar el pago (Tarjeta/Billetera)
+    // Caso B: El Brick envía los datos del formulario para procesar el pago (Tarjeta)
     const { formData, beatId, licenseType } = body;
+
+    // VALIDACIÓN DE SEGURIDAD: Evita el error 'token of null' si el flujo no es de tarjeta
+    if (!formData || !formData.token) {
+      return NextResponse.json({ error: "Datos de tarjeta incompletos" }, { status: 400 });
+    }
 
     const { data: beat } = await supabase
       .from('beats')

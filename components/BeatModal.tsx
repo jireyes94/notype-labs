@@ -62,6 +62,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
 
   const buy = async (license: string, price: number) => {
     setLoading(true);
+    setPaymentError(null);
     setPreferenceId(null);
     setShowPaymentBrick(false);
     setSelectedLicenseName(license);
@@ -80,11 +81,6 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
       const data = await response.json();
       setPreferenceId(data.id);
       setShowPaymentBrick(true);
-      
-      setTimeout(() => {
-        const container = document.getElementById('payment-area');
-        container?.scrollIntoView({ behavior: 'smooth'});
-      }, 100);
     } catch (error) {
       console.error("Error al crear preferencia:", error);
     } finally {
@@ -94,7 +90,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
 
   const initialization = {
     amount: selectedAmount,
-    preferenceId: preferenceId!, // CRUCIAL para mostrar MP
+    preferenceId: preferenceId!,
   };
 
   const customization = {
@@ -102,7 +98,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
       creditCard: "all" as const,
       debitCard: "all" as const,
       mercadoPago: "all" as const,
-      bankTransfer: "all" as const, // Agregado para las 4 opciones
+      bankTransfer: "all" as const,
     },
     visual: {
       style: {
@@ -112,7 +108,13 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
   };
 
   const onSubmit = async ({ selectedPaymentMethod, formData }: any) => {
-    setPaymentError(null); // Limpiamos errores previos
+    setPaymentError(null);
+    
+    // Si es Mercado Pago / Wallet, la documentación indica dejar que el SDK maneje la redirección
+    if (selectedPaymentMethod === 'wallet_purchase' || selectedPaymentMethod === 'mercado_pago') {
+      return new Promise<void>((resolve) => resolve());
+    }
+
     return new Promise<void>(async (resolve, reject) => {
       try {
         const res = await fetch("/api/checkout", {
@@ -127,25 +129,20 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
 
         const paymentResult = await res.json();
 
-        // Verificamos si el pago fue aprobado exitosamente
         if (res.ok && paymentResult.status === 'approved') {
           router.push(`/success?payment_id=${paymentResult.id}`);
           resolve();
         } else {
-          // Manejo de rechazo sin salir del modal
-          const statusDetail = paymentResult.status_detail || "error_desconocido";
-
-          // Mapeo de errores para que el usuario entienda qué pasó
+          const statusDetail = paymentResult.status_detail || "";
           const errorMessages: { [key: string]: string } = {
-            cc_rejected_insufficient_amount: "Fondos insuficientes en la tarjeta.",
+            cc_rejected_insufficient_amount: "Fondos insuficientes.",
             cc_rejected_bad_filled_security_code: "Código de seguridad incorrecto.",
             cc_rejected_call_for_authorize: "Debes autorizar el pago con tu banco.",
             default: "El pago fue rechazado. Intenta con otro medio."
           };
-
           setPaymentError(errorMessages[statusDetail] || errorMessages.default);
           setLoading(false);
-          reject(); // Esto mantiene el Brick activo para reintentar
+          reject();
         }
       } catch (error) {
         console.error(error);
@@ -154,6 +151,19 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
         reject();
       }
     });
+  };
+
+  const handleOnReady = () => {
+    setLoading(false);
+    setTimeout(() => {
+      const element = document.getElementById('payment-area');
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'end' 
+        });
+      }
+    }, 200);
   };
 
   const mp3Price = beat.price;
@@ -250,7 +260,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
             ))}
           </div>
 
-          <div id="payment-area" className="mt-8 scroll-mt-24">
+          <div id="payment-area" className="mt-8 pb-20 scroll-mt-24">
             {paymentError && (
               <div className="mb-4 p-4 bg-red-600/10 border border-red-600/50 rounded-2xl animate-fade-in">
                 <p className="text-red-500 text-[10px] font-black uppercase tracking-widest text-center">
@@ -278,8 +288,11 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
                   initialization={initialization}
                   customization={customization}
                   onSubmit={onSubmit}
-                  onError={(error) => console.error(error)}
-                  onReady={() => setLoading(false)}
+                  onError={(error) => {
+                    console.error(error);
+                    setLoading(false);
+                  }}
+                  onReady={handleOnReady}
                 />
               </div>
             )}
