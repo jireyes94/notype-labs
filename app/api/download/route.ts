@@ -71,26 +71,40 @@ export async function GET(request: Request) {
     });
     const drive = google.drive({ version: "v3", auth });
 
-    // 6. Obtener el archivo de Drive como stream
+    // 6. Obtener el archivo de Drive
     const fileResponse = await drive.files.get(
       { fileId: fileId, alt: "media" },
       { responseType: "stream" }
     );
 
-    // --- CAMBIO AQUÍ PARA EVITAR ARCHIVO CORRUPTO ---
-    // Convertimos el stream de Node a un formato que Next.js entienda perfectamente
+    // Consolidamos los datos para evitar que el archivo se corrompa
     const chunks = [];
     for await (const chunk of fileResponse.data) {
       chunks.push(chunk);
     }
     const buffer = Buffer.concat(chunks);
+
+    // 7. Configuración dinámica de extensión y tipo de archivo
+    let extension = "zip";
+    let contentType = "application/zip";
+
+    if (licenseType === "MP3 Lease") {
+      extension = "mp3";
+      contentType = "audio/mpeg";
+    } else if (licenseType === "WAV Premium") {
+      extension = "wav";
+      contentType = "audio/wav";
+    }
+
+    // Nombre del archivo limpio (ej: Beat_23_MP3_Lease.mp3)
+    const fileName = `Beat_${beatId}_${licenseType.toString().replace(/\s+/g, '_')}.${extension}`;
     
-    // 7. Retornar el archivo usando un Buffer (más estable para archivos pequeños/medianos)
     return new NextResponse(buffer, {
       headers: {
-        "Content-Disposition": `attachment; filename="Beat_${beatId}_${licenseType.toString().replace(/\s+/g, '_')}.zip"`,
-        "Content-Type": "application/zip", // Cambiamos a zip específico
+        "Content-Disposition": `attachment; filename="${fileName}"`,
+        "Content-Type": contentType,
         "Content-Length": buffer.length.toString(),
+        "Cache-Control": "no-store, max-age=0",
       },
     });
 
