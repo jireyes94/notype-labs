@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import { supabase } from "@/lib/supabase";
-import { Readable } from "stream"; // Importante para el casteo de stream
+import { Readable } from "stream";
 
 const mpClient = new MercadoPagoConfig({ 
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN! 
@@ -16,54 +16,52 @@ export async function GET(request: Request) {
   if (!paymentId) return new NextResponse("No autorizado", { status: 401 });
 
   try {
-    // 1. Validar pago REAL con Mercado Pago
     const payment = await new Payment(mpClient).get({ id: paymentId });
     
     if (payment.status !== "approved") {
       return new NextResponse("El pago no ha sido aprobado", { status: 403 });
     }
 
-    // Extraemos de la metadata (Asegurarse de que coincida con route_checkout.ts)
-    const beatId = payment.metadata?.beat_id;
+    // CONVERSIÓN CRUCIAL: De String de MP a Number para Supabase
+    const beatId = Number(payment.metadata?.beat_id);
     const licenseType = payment.metadata?.license_type;
 
-    if (!beatId || !licenseType) {
-      return new NextResponse("Información de licencia faltante", { status: 400 });
+    if (!beatId || isNaN(beatId) || !licenseType) {
+      console.error("Metadata inválida:", payment.metadata);
+      return new NextResponse("Información de licencia o Beat ID faltante", { status: 400 });
     }
 
-    // 2. Buscar en Supabase
+    // Consulta con el ID ya como número
     const { data: assets, error } = await supabase
       .from('beat_assets')
       .select('*')
-      .eq('beat_id', beatId)
+      .eq('beat_id', beatId) // Ahora coincidirá con el int4
       .single();
 
-    if (error || !assets) return new NextResponse("Beat no encontrado en archivos", { status: 404 });
+    if (error || !assets) {
+      console.error("Supabase Error:", error);
+      return new NextResponse("Beat no encontrado en archivos", { status: 404 });
+    }
 
-    // 3. Determinar ID de Drive
     let fileId = assets.drive_mp3_id;
     if (licenseType === "WAV Premium") fileId = assets.drive_wav_id;
     if (licenseType === "Unlimited") fileId = assets.drive_unlimited_id;
 
-    if (!fileId) return new NextResponse("Archivo no configurado en la base de datos", { status: 404 });
+    if (!fileId) return new NextResponse("Archivo no configurado", { status: 404 });
 
-    // 4. Conexión con Google Drive
     const auth = new google.auth.GoogleAuth({
       credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!),
       scopes: ["https://www.googleapis.com/auth/drive.readonly"],
     });
     const drive = google.drive({ version: "v3", auth });
 
-    // 5. Obtener el archivo
     const fileResponse = await drive.files.get(
       { fileId: fileId, alt: "media" },
       { responseType: "stream" }
     );
 
-    // Convertimos el stream de Node a un ReadableStream web para Next.js
     const nodeStream = fileResponse.data as Readable;
     
-    // Devolvemos el archivo con el nombre sanitizado usando las variables correctas
     return new NextResponse(nodeStream as any, {
       headers: {
         "Content-Disposition": `attachment; filename="Beat_${beatId}_${licenseType.toString().replace(/\s+/g, '_')}.zip"`,
@@ -74,7 +72,6 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     console.error("Error en descarga segura:", error);
-    const status = error.code === 404 ? 404 : 500;
-    return new NextResponse("Error procesando la descarga", { status });
+    return new NextResponse("Error procesando la descarga", { status: 500 });
   }
 }
