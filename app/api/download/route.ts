@@ -31,6 +31,11 @@ export async function GET(request: Request) {
       return new NextResponse("Información de licencia o Beat ID faltante", { status: 400 });
     }
 
+    console.log("DEBUG DESCARGA:");
+    console.log("- ID recibido de MP:", payment.metadata?.beat_id);
+    console.log("- ID convertido a Number:", beatId);
+    console.log("- Tipo de dato del ID:", typeof beatId);
+
     // Consulta con el ID ya como número
     const { data: assets, error } = await supabase
       .from('beat_assets')
