@@ -36,10 +36,9 @@ export async function POST(request: Request) {
     });
 
   } catch (error: any) {
-    console.error("MP FULL ERROR:", JSON.stringify(error, null, 2));
-    return NextResponse.json(
-      { error: "Error al crear pago" },
-      { status: 500 }
-    );
+    console.error("MP ERROR RAW:", error);
+    console.error("MP ERROR KEYS:", Object.keys(error || {}));
+    console.error("MP ERROR STRING:", error?.message);
+    return NextResponse.json({ error: "Error al crear pago" }, { status: 500 });
   }
 }
