@@ -9,7 +9,6 @@ export async function POST(request: Request) {
   try {
     const { beat, licenseType } = await request.json();
 
-    // Lógica de precios redondeada para evitar errores en MP
     let finalPrice = Math.round(beat.price);
     if (licenseType === "WAV Premium") finalPrice = Math.round(beat.price * 1.5);
     if (licenseType === "Unlimited") finalPrice = Math.round(beat.price * 4);
@@ -25,6 +24,7 @@ export async function POST(request: Request) {
             currency_id: "ARS",
           }
         ],
+        // IMPORTANTE: Metadata fuera y dentro para asegurar persistencia
         metadata: {
           beat_id: beat.id,
           license_type: licenseType,
@@ -32,9 +32,12 @@ export async function POST(request: Request) {
         back_urls: {
           success: `${process.env.NEXT_PUBLIC_URL}/success`,
           failure: `${process.env.NEXT_PUBLIC_URL}/`,
+          pending: `${process.env.NEXT_PUBLIC_URL}/`,
         },
         auto_return: "approved",
+        // Aseguramos que la URL sea absoluta y correcta
         notification_url: `${process.env.NEXT_PUBLIC_URL}/api/webhooks/mercadopago`,
+        statement_descriptor: "NOTYPELABS",
       },
     });
 
