@@ -5,25 +5,31 @@ const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCE
 
 export async function POST(request: Request) {
   try {
+    const url = new URL(request.url);
     const body = await request.json().catch(() => ({}));
-    const paymentId = body.data?.id || body.id;
+    
+    // Mercado Pago envía el ID de diferentes maneras según el evento
+    const id = body.data?.id || body.id || url.searchParams.get("data.id");
+    const type = body.type || url.searchParams.get("type");
 
-    if (paymentId) {
+    // Solo intentamos buscar si es un pago (payment)
+    if (type === "payment" && id) {
       try {
-        const payment = await new Payment(client).get({ id: paymentId });
+        const payment = await new Payment(client).get({ id: id.toString() });
         
-        // Verificación segura de metadata
-        if (payment.status === "approved" && payment.metadata?.beat_id) {
-          console.log(`✅ Pago exitoso para beat: ${payment.metadata.beat_id}`);
-          // Aquí dispararías el mail al cliente o actualizarías Supabase
+        if (payment.status === "approved") {
+          console.log(`✅ PAGO APROBADO: ${id} para Beat: ${payment.metadata?.beat_id}`);
+          // Aquí puedes agregar tu lógica de envío de emails
         }
       } catch (e) {
-        console.warn("ID de pago no encontrado o error en consulta de pago");
+        console.error("❌ Error al consultar pago en MP:", e);
       }
     }
+
+    // Siempre respondemos 200 para que MP no reintente infinitamente
     return new NextResponse("OK", { status: 200 });
   } catch (error) {
-    console.error("Error crítico en Webhook:", error);
+    console.error("❌ Error crítico en Webhook:", error);
     return new NextResponse("OK", { status: 200 });
   }
 }
