@@ -191,17 +191,27 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
             )}
           
             {preferenceId && (
-              <div className="animate-fade-in bg-white p-6 rounded-[2rem] shadow-2xl">
+              <div id="walletBrick_container" className="animate-fade-in bg-white p-6 rounded-[2rem] shadow-2xl">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-black text-[10px] font-black uppercase tracking-widest">
-                    Pagar con Mercado Pago
+                    Finalizar Compra
                   </p>
                   <button onClick={() => setPreferenceId(null)} className="text-black hover:text-red-600">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
                   </button>
                 </div>
+
                 <Wallet 
-                  initialization={{ preferenceId }} 
+                  initialization={{ 
+                    preferenceId: preferenceId,
+                    redirectMode: 'modal' as any // Esto soluciona el error de "blank" | "self"
+                  }}
+                  customization={{
+                    visual: {
+                      buttonBackground: 'black',
+                      borderRadius: '16px',
+                    }
+                  } as any} // Esto soluciona el error de "visual" no existente
                 />
               </div>
             )}
