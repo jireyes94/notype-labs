@@ -23,6 +23,7 @@ export async function GET(request: Request) {
       return new NextResponse("El pago no ha sido aprobado", { status: 403 });
     }
 
+    // Extraemos de la metadata (Asegurarse de que coincida con route_checkout.ts)
     const beatId = payment.metadata?.beat_id;
     const licenseType = payment.metadata?.license_type;
 
@@ -62,19 +63,17 @@ export async function GET(request: Request) {
     // Convertimos el stream de Node a un ReadableStream web para Next.js
     const nodeStream = fileResponse.data as Readable;
     
-    // El constructor de NextResponse acepta el stream de Node en entornos de servidor (Vercel)
-    // pero para evitar errores de tipos en TS usamos 'any' con precaución aquí.
+    // Devolvemos el archivo con el nombre sanitizado usando las variables correctas
     return new NextResponse(nodeStream as any, {
       headers: {
         "Content-Disposition": `attachment; filename="Beat_${beatId}_${licenseType.toString().replace(/\s+/g, '_')}.zip"`,
         "Content-Type": "application/octet-stream",
-        "Cache-Control": "no-store, max-age=0", // Evitar que el navegador cachee la descarga
+        "Cache-Control": "no-store, max-age=0",
       },
     });
 
   } catch (error: any) {
     console.error("Error en descarga segura:", error);
-    // Si el error viene de Google API, suele traer un código
     const status = error.code === 404 ? 404 : 500;
     return new NextResponse("Error procesando la descarga", { status });
   }

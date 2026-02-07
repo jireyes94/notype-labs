@@ -55,31 +55,33 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
     setLoading(false);
   };
 
-  // Función de compra
+  // Función de compra refactorizada
   const buy = async (license: string) => {
     try {
-      setPreferenceId(null);
+      setPreferenceId(null); // Resetear estado previo
       setLoading(true);
-
+      
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
-          beatId: beat.id, 
+          beat: beat, 
           licenseType: license 
         }),
       });
 
-      if (!res.ok) throw new Error("Error servidor");
+      if (!res.ok) throw new Error("Error en la respuesta del servidor");
 
       const data = await res.json();
-      setPreferenceId(data.id);
-
+      
+      if (data.id) {
+        setPreferenceId(data.id);
+      }
     } catch (error) {
-      console.error("Error checkout:", error);
-      alert("Error al iniciar pago");
+      console.error("Error al iniciar checkout:", error);
+      alert("Hubo un error al conectar con Mercado Pago. Intenta nuevamente.");
     } finally {
       setLoading(false);
     }
@@ -198,12 +200,22 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
                   </button>
                 </div>
-                <Wallet initialization={{ preferenceId }} />
+                <Wallet 
+                  initialization={{ preferenceId }} 
+                />
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slide-left { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .animate-slide-left { animation: slide-left 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
 }
