@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         // REQUISITO DOCUMENTACIÓN WALLET BRICK:
         purpose: 'wallet_purchase', 
         metadata: {
-          beat_id: beat.id,
+          beat_id: beat.id.toString(), // ESTO ES VITAL
           license_type: licenseType,
         },
         back_urls: {
