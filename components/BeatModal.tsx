@@ -8,6 +8,7 @@ import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
 export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () => void }) {
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://notypelabs.vercel.app';
   const [showPaymentBrick, setShowPaymentBrick] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
@@ -111,6 +112,7 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
   };
 
   const onSubmit = async ({ selectedPaymentMethod, formData }: any) => {
+    setPaymentError(null); // Limpiamos errores previos
     return new Promise<void>(async (resolve, reject) => {
       try {
         const res = await fetch("/api/checkout", {
@@ -123,14 +125,32 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
           }),
         });
 
-        if (res.ok) {
-          router.push('/success');
+        const paymentResult = await res.json();
+
+        // Verificamos si el pago fue aprobado exitosamente
+        if (res.ok && paymentResult.status === 'approved') {
+          router.push(`/success?payment_id=${paymentResult.id}`);
           resolve();
         } else {
-          throw new Error("Error en el pago");
+          // Manejo de rechazo sin salir del modal
+          const statusDetail = paymentResult.status_detail || "error_desconocido";
+
+          // Mapeo de errores para que el usuario entienda qué pasó
+          const errorMessages: { [key: string]: string } = {
+            cc_rejected_insufficient_amount: "Fondos insuficientes en la tarjeta.",
+            cc_rejected_bad_filled_security_code: "Código de seguridad incorrecto.",
+            cc_rejected_call_for_authorize: "Debes autorizar el pago con tu banco.",
+            default: "El pago fue rechazado. Intenta con otro medio."
+          };
+
+          setPaymentError(errorMessages[statusDetail] || errorMessages.default);
+          setLoading(false);
+          reject(); // Esto mantiene el Brick activo para reintentar
         }
       } catch (error) {
         console.error(error);
+        setPaymentError("Hubo un problema técnico al procesar el pago.");
+        setLoading(false);
         reject();
       }
     });
@@ -231,6 +251,13 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
           </div>
 
           <div id="payment-area" className="mt-8 scroll-mt-24">
+            {paymentError && (
+              <div className="mb-4 p-4 bg-red-600/10 border border-red-600/50 rounded-2xl animate-fade-in">
+                <p className="text-red-500 text-[10px] font-black uppercase tracking-widest text-center">
+                  {paymentError}
+                </p>
+              </div>
+            )}
             {showPaymentBrick && preferenceId && (
               <div className="animate-fade-in bg-zinc-900/50 border border-white/10 p-2 rounded-[2rem] shadow-2xl">
                 <div className="flex justify-between items-center p-4">
