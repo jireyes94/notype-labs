@@ -1,4 +1,6 @@
 // app/api/webhooks/mercadopago/route.ts
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
