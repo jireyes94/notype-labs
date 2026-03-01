@@ -59,7 +59,7 @@ export default function Footer() {
 
               {/* YOUTUBE */}
               <a 
-                href="https://youtube.com/@prod_enar" 
+                href="https://youtube.com/@notypelabs" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-12 h-12 rounded-xl border border-white/5 bg-zinc-900/30 flex items-center justify-center text-zinc-500 hover:border-red-600/50 hover:text-red-600 hover:shadow-[0_0_20px_rgba(220,38,38,0.2)] transition-all duration-300 group"

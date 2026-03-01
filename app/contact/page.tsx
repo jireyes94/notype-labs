@@ -35,7 +35,7 @@ export default function ContactPage() {
 
           {/* INSTAGRAM */}
           <a
-            href="https://instagram.com/prod_enar/"
+            href="https://instagram.com/notype.labs/"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative flex flex-col items-center justify-center gap-3 px-6 py-8 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white font-bold uppercase tracking-tighter rounded-3xl hover:scale-105 transition-all duration-300 overflow-hidden shadow-[0_0_30px_rgba(238,42,123,0.2)]"
@@ -47,7 +47,7 @@ export default function ContactPage() {
 
           {/* YOUTUBE */}
           <a
-            href="https://youtube.com/@prod_enar" // REEMPLAZA
+            href="https://youtube.com/@notypelabs" // REEMPLAZA
             target="_blank"
             rel="noopener noreferrer"
             className="group relative flex flex-col items-center justify-center gap-3 px-6 py-8 bg-[#FF0000] text-white font-bold uppercase tracking-tighter rounded-3xl hover:scale-105 transition-all duration-300 overflow-hidden shadow-[0_0_30px_rgba(255,0,0,0.2)]"
