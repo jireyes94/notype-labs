@@ -64,7 +64,13 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
         <div className="space-y-1.5">
           {/* TÍTULO AGRANDADO E ITALIC */}
           <h2 className="block font-black text-lg md:text-xl text-white group-hover:text-red-600 transition-colors truncate uppercase tracking-tighter italic">
-            {beat.title}
+            <Link
+              href={`/beats/${beat.slug}`}
+              onClick={(event) => event.stopPropagation()}
+              className="hover:underline underline-offset-4"
+            >
+              {beat.title}
+            </Link>
           </h2>
         </div>
         

@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { Metadata } from "next";
 import BeatPageClient from "./BeatPageClient";
 import { notFound } from 'next/navigation';
+import { SITE_URL } from '@/lib/site';
 
 export const dynamicParams = true;
 
@@ -21,15 +22,19 @@ export async function generateMetadata({
 
   if (!beat) return { title: "Beat no encontrado" };
 
-  const imageUrl = beat.cover_url || `https://notypelabs.vercel.app/covers/${beat.slug}.jpg`;
+  const imageUrl = beat.cover_url || `${SITE_URL}/covers/${beat.slug}.jpg`;
 
   return {
     title: `${beat.title} (${beat.bpm} BPM) - ${beat.key}`,
     description: `Escuchá y comprá la licencia de "${beat.title}". Mood: ${beat.mood} | Producido por NOTYPE.LABS`,
+    alternates: {
+      canonical: `/beats/${slug}`,
+    },
+    robots: beat.is_sold ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: `${beat.title} - Beat Instrumental`,
       description: `BPM: ${beat.bpm} | Key: ${beat.key} | Mood: ${beat.mood}. Disponible ahora en NOTYPE.LABS.`,
-      url: `https://notypelabs.vercel.app/beats/${slug}`,
+      url: `${SITE_URL}/beats/${slug}`,
       siteName: "NOTYPE.LABS",
       images: [{ url: imageUrl, width: 800, height: 800 }],
       type: "music.song",
