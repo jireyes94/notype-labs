@@ -1,14 +1,27 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAudio, Beat } from "./AudioContext";
 
 export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Beat) => void }) {
   const { playBeat, currentBeat, isPlaying } = useAudio();
+  const router = useRouter();
   const isThisBeatActive = currentBeat?.slug === beat.slug && isPlaying;
+
+  const openBeatPage = () => router.push(`/beats/${beat.slug}`);
 
   return (
     <div 
-      onClick={() => { if (!beat.is_sold) onBuy(beat); }} // <-- AHORA TODA LA CARD ABRE EL MODAL
+      onClick={openBeatPage}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openBeatPage();
+        }
+      }}
+      role="link"
+      tabIndex={0}
+      aria-label={`Ver detalles del beat ${beat.title}`}
       className={`bg-zinc-950 rounded-2xl border border-zinc-900 overflow-hidden hover:border-red-600/50 transition-all group flex flex-col h-full shadow-lg relative cursor-pointer max-w-[300px] mx-auto w-full ${beat.is_sold ? 'opacity-80' : ''}`}
     >
       {/* ETIQUETA SOLD */}
@@ -86,6 +99,7 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
           <button 
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               if (!beat.is_sold) onBuy(beat); // Solo abre modal si no está vendido
             }}
             disabled={beat.is_sold}
