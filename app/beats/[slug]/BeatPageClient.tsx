@@ -207,8 +207,8 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
                     Este beat ya fue adquirido bajo una licencia exclusiva y no está disponible para nuevas ventas.
                   </p>
                   <div className="pt-4">
-                    <Link 
-                      href="/beats" 
+                    <Link
+                      href="/"
                       className="text-white text-[10px] font-black uppercase tracking-widest border-b border-white hover:text-red-500 hover:border-red-500 transition-all"
                     >
                       Explorar otros beats

@@ -7,7 +7,7 @@ export type Beat = {
   title: string;
   bpm: number;
   key: string;
-  mood: string;
+  mood: string | string[];
   price: number;
   preview: string;    // Este lo usamos para el reproductor (mapeado de mp3_url)
   mp3_url?: string;   // Agregalo por seguridad

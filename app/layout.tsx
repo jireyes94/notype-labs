@@ -4,15 +4,16 @@ import { AudioProvider } from "@/components/AudioContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AudioPlayer from "@/components/AudioPlayer";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://notypelabs.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "NOTYPE.LABS | Beat Store & Producción Musical",
     template: "%s | NOTYPE.LABS",
   },
   description:
-    "Venta de Beats de alta calidad: Trap, Reggaeton, Drill y R&B. Sonido profesional para artistas independientes. NoType Labs - Tu próximo hit empieza acá.",
+    "Beats originales de trap, reggaetón, drill, rap y R&B para artistas de Argentina. Licencias claras, precios en pesos y Mercado Pago.",
   
   // 1. ESTANDARIZAMOS EL NOMBRE (Esto es lo que lee Google para el título del sitio)
   applicationName: 'NOTYPE.LABS',
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   },
 
   keywords: [
-    "Beats", "Instrumentales", "Trap Beats", "Reggaeton Beats", "Venta de beats", "NoType Labs", "Productores musicales",
+    "comprar beats en Argentina", "instrumentales", "trap beats", "reggaetón beats", "licencias de beats", "NOTYPE.LABS",
   ],
   authors: [{ name: "NOTYPE.LABS" }],
 
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "NOTYPE.LABS | Beat Store",
     description: "Instrumentales profesionales para tu próximo proyecto musical.",
-    url: "https://notypelabs.vercel.app",
+    url: "/",
     // 3. ASEGURAMOS QUE EL SITENAME SEA EXACTO
     siteName: "NOTYPE.LABS",
     images: [
@@ -61,7 +62,7 @@ export const metadata: Metadata = {
 // app/layout.tsx
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className="bg-black">
+    <html lang="es-AR" className="bg-black">
       {/* Volvemos a un body normal que crece con su contenido */}
       <body className="antialiased min-h-screen bg-black text-white flex flex-col">
         <AudioProvider>
