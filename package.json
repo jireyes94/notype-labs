@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:integrations": "node --env-file=.env.local scripts/check-integrations.mjs",
+    "check:integrations:production": "node --env-file=.env.production.local scripts/check-integrations.mjs --allow-production",
     "check:asset-sizes": "node --env-file=.env.local scripts/check-asset-sizes.mjs",
     "migrate:assets:r2": "node --env-file=.env.local scripts/migrate-assets-to-r2.mjs"
   },

@@ -37,15 +37,19 @@ async function checkSupabase() {
 
 async function checkUala() {
   const environment = requireEnv("UALA_ENVIRONMENT");
+  const productionExplicitlyAllowed = process.argv.includes("--allow-production");
 
-  if (environment !== "test") {
+  if (environment !== "test" && !(environment === "production" && productionExplicitlyAllowed)) {
     throw new Error(
-      "El chequeo local solo permite UALA_ENVIRONMENT=test para evitar operaciones productivas.",
+      "El chequeo de producción requiere --allow-production para evitar usos accidentales.",
     );
   }
 
+  const authBaseUrl = environment === "production"
+    ? "https://auth.developers.ar.ua.la/v2/api"
+    : "https://auth.stage.developers.ar.ua.la/v2/api";
   const response = await fetch(
-    "https://auth.stage.developers.ar.ua.la/v2/api/auth/token",
+    `${authBaseUrl}/auth/token`,
     {
       method: "POST",
       headers: {
@@ -81,7 +85,7 @@ async function checkUala() {
   }
 
   console.log(
-    `✓ Ualá v2 test autenticado (token válido por ${token.expires_in} segundos)`,
+    `✓ Ualá v2 ${environment} autenticado (token válido por ${token.expires_in} segundos)`,
   );
 }
 
