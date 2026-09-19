@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:integrations": "node --env-file=.env.local scripts/check-integrations.mjs"
   },
   "dependencies": {
     "@mercadopago/sdk-react": "^1.0.7",
