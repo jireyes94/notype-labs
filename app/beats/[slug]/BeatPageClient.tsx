@@ -136,6 +136,18 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
     setWasAddedToCart(true);
   };
 
+  const handleBuyNow = () => {
+    handleAddToCart();
+    trackEvent("begin_checkout", {
+      item_id: beatFromDB.slug,
+      item_name: editData.title,
+      license_type: selectedLicenseId,
+      source: "beat_page",
+      currency: "ARS",
+    });
+    router.push("/checkout");
+  };
+
   useEffect(() => {
     if (beatFromDB?.mp3_url && currentBeat?.slug !== beatFromDB.slug) {
       playBeat({ ...beatFromDB, preview: beatFromDB.mp3_url });
@@ -313,18 +325,29 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
                     })}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    className="mt-6 w-full rounded-full bg-white px-6 py-4 text-xs font-black uppercase tracking-widest text-black transition-colors hover:bg-red-600 hover:text-white"
-                  >
-                    {wasAddedToCart ? "Agregado al carrito" : "Agregar al carrito"}
-                  </button>
+                  <div className="mt-6 grid gap-3">
+                    <button
+                      type="button"
+                      onClick={handleAddToCart}
+                      className="w-full rounded-full bg-white px-6 py-4 text-xs font-black uppercase tracking-widest text-black transition-colors hover:bg-red-600 hover:text-white"
+                    >
+                      {wasAddedToCart
+                        ? "Agregado al carrito"
+                        : "Agregar al carrito"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleBuyNow}
+                      className="w-full rounded-full bg-red-600 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-red-700"
+                    >
+                      Comprar ahora
+                    </button>
+                  </div>
 
                   {wasAddedToCart ? (
                     <Link
                       href="/cart"
-                      className="mt-3 flex w-full justify-center rounded-full border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition-colors hover:border-red-600 hover:text-red-500"
+                      className="mt-4 block text-center text-[10px] font-black uppercase tracking-widest text-zinc-500 transition-colors hover:text-white"
                     >
                       Ver carrito
                     </Link>

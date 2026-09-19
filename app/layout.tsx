@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: "%s | NOTYPE.LABS",
   },
   description:
-    "Beats originales de trap, reggaetón, drill, rap y R&B para artistas de Argentina. Licencias claras, precios en pesos y Mercado Pago.",
+    "Beats originales de trap, reggaetón, drill, rap y R&B para artistas de Argentina. Licencias claras, precios en pesos y entrega digital.",
 
   applicationName: "NOTYPE.LABS",
 

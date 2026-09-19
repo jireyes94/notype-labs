@@ -130,16 +130,15 @@ export default function CartPage() {
                 </span>
               </div>
               <p className="mt-5 text-xs leading-relaxed text-zinc-500">
-                El pago todavía no está habilitado mientras integramos la nueva
-                pasarela segura.
+                Revisá tu pedido y completá tus datos antes de elegir el medio
+                de pago.
               </p>
-              <button
-                type="button"
-                disabled
-                className="mt-6 w-full cursor-not-allowed rounded-full bg-zinc-800 px-6 py-4 text-xs font-black uppercase tracking-widest text-zinc-500"
+              <Link
+                href="/checkout"
+                className="mt-6 flex w-full justify-center rounded-full bg-red-600 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-red-700"
               >
                 Continuar al checkout
-              </button>
+              </Link>
             </aside>
           </div>
         )}
