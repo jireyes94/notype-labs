@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
 import { formatArs, getLicense } from "@/lib/licenses";
@@ -84,12 +83,11 @@ export default function CartPage() {
                   >
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-zinc-900">
                       {item.coverUrl ? (
-                        <Image
-                          src={item.coverUrl}
-                          alt={item.title}
-                          fill
-                          sizes="96px"
-                          className="object-cover"
+                        <div
+                          role="img"
+                          aria-label={item.title}
+                          className="h-full w-full bg-cover bg-center"
+                          style={{ backgroundImage: `url("${item.coverUrl}")` }}
                         />
                       ) : null}
                     </div>
