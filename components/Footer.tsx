@@ -27,15 +27,17 @@ export default function Footer() {
             <ul className="space-y-4">
               <li><Link href="/" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Beats</Link></li>
               <li><Link href="/generos" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Géneros</Link></li>
+              <li><Link href="/guias" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Guías para artistas</Link></li>
               <li><Link href="/licenses" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Licencias</Link></li>
               <li><Link href="/faq" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Preguntas frecuentes</Link></li>
+              <li><Link href="/sobre-notype-labs" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Sobre NOTYPE.LABS</Link></li>
               <li><Link href="/contact" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Contacto</Link></li>
             </ul>
           </div>
 
           {/* Columna 3: Legal */}
           <div>
-            <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Legal</h4>
+            <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Información</h4>
             <ul className="space-y-4">
               <li><Link href="/terms" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Terminos</Link></li>
               <li><Link href="/privacy" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Politica de privacidad</Link></li>
