@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useMemo } from "react";
 import BeatCard from "@/components/BeatCard";
-import BeatModal from "@/components/BeatModal";
 import { Beat } from "@/components/AudioContext";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from 'react';
@@ -27,7 +26,6 @@ export default function HomeCatalog({ initialBeats }: { initialBeats: Beat[] }) 
 function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
   const searchParams = useSearchParams();
   const querySearch = searchParams.get("search");
-  const [selectedBeat, setSelectedBeat] = useState<Beat | null>(null);
   const [beats] = useState<Beat[]>(initialBeats);
   const [searchTerm, setSearchTerm] = useState(querySearch ?? "");
   const [hideSold, setHideSold] = useState(false);
@@ -201,7 +199,7 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {displayedBeats.map((beat) => (
-                <BeatCard key={beat.id} beat={beat} onBuy={(b) => setSelectedBeat(b)} />
+                <BeatCard key={beat.id} beat={beat} />
               ))}
             </div>
           )}
@@ -266,11 +264,6 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
           </div>
         </div>
       </section>
-
-      {/* Modales */}
-      {selectedBeat && (
-        <BeatModal beat={selectedBeat} onClose={() => setSelectedBeat(null)} />
-      )}
     </main>
   );
 }

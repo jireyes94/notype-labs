@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { useAudio, Beat } from "./AudioContext";
 
-export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Beat) => void }) {
+export default function BeatCard({ beat }: { beat: Beat }) {
   const { playBeat, currentBeat, isPlaying } = useAudio();
   const router = useRouter();
   const isThisBeatActive = currentBeat?.slug === beat.slug && isPlaying;
@@ -100,21 +100,29 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
             </span>
           </div>
                   
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              trackEvent("select_license", { item_id: beat.slug, item_name: beat.title, source: "catalog_card" });
-              if (!beat.is_sold) onBuy(beat); // Solo abre modal si no está vendido
+          <button
+            type="button"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              if (!beat.is_sold) {
+                trackEvent("select_license", {
+                  item_id: beat.slug,
+                  item_name: beat.title,
+                  source: "catalog_card",
+                });
+                openBeatPage();
+              }
             }}
             disabled={beat.is_sold}
-            className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg z-20 whitespace-nowrap ${
-              beat.is_sold 
-              ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
-              : 'bg-white text-black hover:bg-red-600 hover:text-white active:scale-95'
+            className={`z-20 flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-widest shadow-lg transition-all sm:flex-none sm:px-4 ${
+              beat.is_sold
+                ? "cursor-not-allowed bg-zinc-800 text-zinc-500"
+                : "bg-white text-black hover:bg-red-600 hover:text-white active:scale-95"
             }`}
           >
-            {beat.is_sold ? 'Vendido' : 'Comprar'}
+            {beat.is_sold ? "Vendido" : "Ver licencias"}
           </button>
         </div>
       </div>
