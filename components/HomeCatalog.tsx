@@ -5,6 +5,8 @@ import BeatModal from "@/components/BeatModal";
 import { Beat } from "@/components/AudioContext";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from 'react';
+import Link from "next/link";
+import { GENRES } from "@/lib/genres";
 
 // COMPONENTE PRINCIPAL CON SUSPENSE
 export default function HomeCatalog({ initialBeats }: { initialBeats: Beat[] }) {
@@ -88,11 +90,14 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
             <span className="text-red-600 font-black uppercase tracking-[0.5em] text-[10px] md:text-xs mb-4 drop-shadow-md">
               Sonido Exclusivo
             </span>
-            <h1 className="text-5xl md:text-8xl lg:text-9xl font-black uppercase italic tracking-tighter leading-[0.9] max-w-4xl drop-shadow-2xl">
-              Lleva tu <br /> 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500">música</span> <br />
-              <span className="text-white">al siguiente nivel</span>
+            <h1 className="text-5xl md:text-8xl lg:text-9xl font-black uppercase italic tracking-tighter leading-[0.9] max-w-5xl drop-shadow-2xl">
+              Comprar <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500">beats</span> <br />
+              <span className="text-white">en Argentina</span>
             </h1>
+            <p className="mt-8 max-w-2xl text-sm font-medium leading-relaxed text-zinc-300 md:text-base">
+              Instrumentales originales para artistas. Escuchá el catálogo, elegí tu licencia y pagá en pesos argentinos.
+            </p>
           </div>
         </div>
 
@@ -175,7 +180,7 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
         </div>
       </section>
       {/* 3. GRILLA DE CONTENIDO */}
-      <section className="px-4 md:px-8 mt-10">
+      <section id="catalogo" className="px-4 md:px-8 mt-10">
         <div className="max-w-[1600px] mx-auto">
           {filteredBeats.length === 0 ? (
             <div className="py-20 text-center">
@@ -196,6 +201,46 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
               <div className="w-8 h-8 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="px-4 pt-20 md:px-8" aria-labelledby="genres-title">
+        <div className="mx-auto max-w-[1600px] border-t border-zinc-900 pt-14">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-red-600">Encontrá tu sonido</p>
+              <h2 id="genres-title" className="text-3xl font-black uppercase italic tracking-tighter md:text-5xl">Beats por género</h2>
+            </div>
+            <Link href="/generos" className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 hover:text-white">Ver todos los géneros →</Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+            {GENRES.map((genre) => (
+              <Link key={genre.slug} href={`/generos/${genre.slug}`} className="rounded-2xl border border-zinc-900 bg-zinc-950 px-5 py-7 text-center text-sm font-black uppercase italic tracking-wider transition-all hover:border-red-600/60 hover:text-red-500">
+                {genre.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-20 md:px-8" aria-labelledby="buy-argentina-title">
+        <div className="mx-auto grid max-w-[1600px] gap-8 rounded-3xl border border-zinc-900 bg-zinc-950/50 p-8 md:grid-cols-[1.2fr_1fr] md:p-12">
+          <div>
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.4em] text-red-600">Compra local</p>
+            <h2 id="buy-argentina-title" className="text-3xl font-black uppercase italic tracking-tighter md:text-5xl">Licencias claras, precios en pesos</h2>
+            <p className="mt-6 max-w-3xl leading-relaxed text-zinc-400">
+              Cada beat muestra BPM, tonalidad, estilo y alternativas de licencia. Podés escuchar antes de comprar y elegir el formato que corresponda a tu lanzamiento.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
+            {["Pago online con Mercado Pago", "Precios expresados en ARS", "Soporte desde Argentina"].map((item) => (
+              <div key={item} className="rounded-2xl border border-zinc-900 bg-black px-5 py-4 text-xs font-bold uppercase tracking-wider text-zinc-300">✓ {item}</div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-4 md:col-span-2">
+            <Link href="/licenses" className="rounded-full bg-red-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-700">Comparar licencias</Link>
+            <Link href="/faq" className="rounded-full border border-zinc-700 px-6 py-3 text-[10px] font-black uppercase tracking-widest hover:border-white">Cómo funciona la compra</Link>
+          </div>
         </div>
       </section>
 
