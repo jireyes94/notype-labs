@@ -4,17 +4,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, usePathname } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   // Simplificamos los links según tu nueva estrategia
   const links = [
+    { name: "Géneros", path: "/generos" },
     { name: "Licencias", path: "/licenses" },
-    { name: "Contacto", path: "/contact" },
+    { name: "FAQ", path: "/faq" },
   ];
 
   useEffect(() => {
@@ -29,15 +31,13 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => { setIsOpen(false); }, [pathname]);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
   };
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
   return (
     <>
