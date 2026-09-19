@@ -2,7 +2,7 @@
 import { createContext, useContext, useState } from "react";
 
 export type Beat = {
-  id?: number;
+  id?: number | string;
   slug: string;
   title: string;
   bpm: number;
