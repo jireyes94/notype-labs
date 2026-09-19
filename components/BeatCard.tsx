@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/analytics";
 import { useAudio, Beat } from "./AudioContext";
 
 export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Beat) => void }) {
@@ -8,7 +9,10 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
   const router = useRouter();
   const isThisBeatActive = currentBeat?.slug === beat.slug && isPlaying;
 
-  const openBeatPage = () => router.push(`/beats/${beat.slug}`);
+  const openBeatPage = () => {
+    trackEvent("select_item", { item_id: beat.slug, item_name: beat.title, price: beat.price, currency: "ARS" });
+    router.push(`/beats/${beat.slug}`);
+  };
 
   return (
     <div 
@@ -100,6 +104,7 @@ export default function BeatCard({ beat, onBuy }: { beat: Beat; onBuy: (beat: Be
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              trackEvent("select_license", { item_id: beat.slug, item_name: beat.title, source: "catalog_card" });
               if (!beat.is_sold) onBuy(beat); // Solo abre modal si no está vendido
             }}
             disabled={beat.is_sold}
