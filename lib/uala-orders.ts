@@ -2,6 +2,7 @@ import "server-only";
 
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUalaOrder, type UalaOrderStatus } from "@/lib/uala";
+import { ensureOrderDownloads } from "@/lib/download-entitlements";
 
 const LOCAL_STATUS: Record<UalaOrderStatus, string> = {
   PENDING: "payment_pending",
@@ -46,5 +47,7 @@ export async function reconcileUalaOrder(orderId: string, providerOrderId?: stri
   const { error: updateError } = await admin.from("orders").update(update).eq("id", order.id);
   if (updateError) throw updateError;
 
-  return { id: order.id as string, status, providerStatus: providerOrder.status };
+  const downloads = status === "paid" ? await ensureOrderDownloads(order.id) : [];
+
+  return { id: order.id as string, status, providerStatus: providerOrder.status, downloads };
 }

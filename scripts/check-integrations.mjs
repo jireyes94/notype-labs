@@ -85,6 +85,11 @@ async function checkUala() {
 }
 
 try {
+  const downloadSecret = requireEnv("DOWNLOAD_TOKEN_SECRET");
+  if (downloadSecret.length < 32) {
+    throw new Error("DOWNLOAD_TOKEN_SECRET debe contener al menos 32 caracteres");
+  }
+  console.log("✓ Secreto de descargas configurado");
   await checkSupabase();
   await checkUala();
   console.log("✓ Integraciones privadas verificadas sin crear órdenes ni pagos");
