@@ -40,7 +40,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
     <main className="min-h-screen bg-black px-6 pb-40 pt-32 text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <article className="mx-auto max-w-4xl">
-        <nav aria-label="Breadcrumb" className="mb-10 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600"><Link href="/" className="hover:text-white">Beats</Link><span className="mx-2">/</span><Link href="/guias" className="hover:text-white">Guías</Link></nav>
+        <nav aria-label="Breadcrumb" className="mb-10 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600"><Link href="/#catalogo" className="hover:text-white">Beats</Link><span className="mx-2">/</span><Link href="/guias" className="hover:text-white">Guías</Link></nav>
         <header className="border-b border-zinc-900 pb-12">
           <div className="flex gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-red-600"><span>{guide.eyebrow}</span><span className="text-zinc-700">·</span><span className="text-zinc-500">{guide.readingTime} de lectura</span></div>
           <h1 className="mt-6 text-5xl font-black uppercase italic leading-none tracking-tighter md:text-7xl">{guide.title}</h1>
