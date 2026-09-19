@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Metadata } from "next";
 import { AudioProvider } from "@/components/AudioContext";
+import { CartProvider } from "@/components/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -14,36 +15,38 @@ export const metadata: Metadata = {
     template: "%s | NOTYPE.LABS",
   },
   description:
-    "Beats originales de trap, reggaetón, drill, rap y R&B para artistas de Argentina. Licencias claras, precios en pesos y Mercado Pago.",
-  
-  // 1. ESTANDARIZAMOS EL NOMBRE (Esto es lo que lee Google para el título del sitio)
-  applicationName: 'NOTYPE.LABS',
-  
-  // 2. AGREGAMOS ESTO PARA APPLE Y MÓVILES (Ayuda a la indexación de marca)
+    "Beats originales de trap, reggaetón, drill, rap y R&B para artistas de Argentina. Licencias claras, precios en pesos y entrega digital.",
+
+  applicationName: "NOTYPE.LABS",
+
   appleWebApp: {
-    title: 'NOTYPE.LABS',
-    statusBarStyle: 'default',
+    title: "NOTYPE.LABS",
+    statusBarStyle: "default",
     capable: true,
   },
 
   keywords: [
-    "comprar beats en Argentina", "instrumentales", "trap beats", "reggaetón beats", "licencias de beats", "NOTYPE.LABS",
+    "comprar beats en Argentina",
+    "instrumentales",
+    "trap beats",
+    "reggaetón beats",
+    "licencias de beats",
+    "NOTYPE.LABS",
   ],
   authors: [{ name: "NOTYPE.LABS" }],
 
   verification: {
     google: "199ikbjNqZ38QLsL-mX6bOY7HFKPlShP0QUB-iGtNRA",
   },
-  
+
   openGraph: {
     title: "NOTYPE.LABS | Beat Store",
     description: "Instrumentales profesionales para tu próximo proyecto musical.",
     url: "/",
-    // 3. ASEGURAMOS QUE EL SITENAME SEA EXACTO
     siteName: "NOTYPE.LABS",
     images: [
       {
-        url: "/og-image.jpg", 
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "NOTYPE.LABS - Beat Store",
@@ -60,24 +63,23 @@ export const metadata: Metadata = {
   },
 };
 
-// app/layout.tsx
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="es-AR" className="bg-black">
-      {/* Volvemos a un body normal que crece con su contenido */}
-      <body className="antialiased min-h-screen bg-black text-white flex flex-col">
+      <body className="flex min-h-screen flex-col bg-black text-white antialiased">
         <Analytics />
-        <AudioProvider>
-          <Navbar />
-          
-          {/* El main ya no tiene scroll interno, el scroll es de la página completa */}
-          <main className="flex-grow w-full">
-            {children}
-          </main>
-          <Footer />
-          {/* El reproductor ahora es el último elemento, como un footer */}
-          <AudioPlayer />
-        </AudioProvider>
+        <CartProvider>
+          <AudioProvider>
+            <Navbar />
+            <main className="w-full flex-grow">{children}</main>
+            <Footer />
+            <AudioPlayer />
+          </AudioProvider>
+        </CartProvider>
       </body>
     </html>
   );

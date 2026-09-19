@@ -1,92 +1,48 @@
-// app/api/download/route.ts
 import { NextResponse } from "next/server";
-import { google } from "googleapis";
-import { MercadoPagoConfig, Payment } from "mercadopago";
-import { supabase } from "@/lib/supabase";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { hashDownloadToken } from "@/lib/download-entitlements";
+import { getR2Bucket, getR2Client } from "@/lib/r2";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
-const mpClient = new MercadoPagoConfig({ 
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN! 
-});
+type ConsumedDownload = {
+  order_item_id: string;
+  beat_id: number;
+  beat_title: string;
+  license_id: "mp3" | "wav" | "unlimited";
+  r2_object_key: string;
+};
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const paymentId = searchParams.get("payment_id");
-
-  if (!paymentId) return new NextResponse("No autorizado", { status: 401 });
+  const token = new URL(request.url).searchParams.get("token");
+  if (!token || token.length > 200) {
+    return new NextResponse("Enlace de descarga inválido", { status: 401 });
+  }
 
   try {
-    // 1. Validar pago
-    const payment = await new Payment(mpClient).get({ id: paymentId });
-    if (payment.status !== "approved") {
-      return new NextResponse("El pago no ha sido aprobado", { status: 403 });
-    }
-
-    const beatId = Number(payment.metadata?.beat_id);
-    const licenseType = payment.metadata?.license_type;
-
-    if (!beatId || isNaN(beatId) || !licenseType) {
-      return new NextResponse("Metadata faltante", { status: 400 });
-    }
-
-    // 2. Buscar en Supabase
-    const { data: assets, error } = await supabase
-      .from('beat_assets')
-      .select('*')
-      .eq('beat_id', beatId)
-      .single();
-
-    if (error || !assets) return new NextResponse("Beat no encontrado", { status: 404 });
-
-    // 3. Determinar File ID y Extensión
-    let fileId = assets.drive_mp3_id;
-    let extension = "mp3";
-    let contentType = "audio/mpeg";
-
-    if (licenseType === "WAV Premium") {
-      fileId = assets.drive_wav_id;
-      extension = "wav";
-      contentType = "audio/wav";
-    } else if (licenseType === "Unlimited") {
-      fileId = assets.drive_unlimited_id;
-      extension = "zip";
-      contentType = "application/zip";
-    }
-
-    if (!fileId) return new NextResponse("Archivo no configurado", { status: 404 });
-
-    // 4. Google Drive
-    const credentialsRaw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-    const cleanCredentials = JSON.parse(credentialsRaw!.trim().replace(/^'|'$/g, ''));
-
-    const auth = new google.auth.GoogleAuth({
-      credentials: cleanCredentials,
-      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    const admin = getSupabaseAdmin();
+    const { data, error } = await admin.rpc("consume_download_entitlement", {
+      p_token_hash: hashDownloadToken(token),
     });
-    const drive = google.drive({ version: "v3", auth });
+    const consumed = (data?.[0] ?? null) as ConsumedDownload | null;
+    if (error) throw error;
+    if (!consumed) {
+      return new NextResponse("El enlace venció o alcanzó su límite de descargas", { status: 403 });
+    }
 
-    // 5. Descargar el archivo de Drive
-    const response = await drive.files.get(
-      { fileId: fileId, alt: "media" },
-      { responseType: "arraybuffer" } // <--- CAMBIO CLAVE: Pedimos ArrayBuffer
+    const downloadUrl = await getSignedUrl(
+      getR2Client(),
+      new GetObjectCommand({
+        Bucket: getR2Bucket(),
+        Key: consumed.r2_object_key,
+      }),
+      { expiresIn: 300 },
     );
-
-    // Convertimos a Buffer de Node.js
-    const buffer = Buffer.from(response.data as ArrayBuffer);
-
-    const fileName = `Beat_${beatId}_${licenseType.replace(/\s+/g, '_')}.${extension}`;
-
-    // 6. Respuesta final
-    return new NextResponse(buffer, {
-      status: 200,
-      headers: {
-        "Content-Type": contentType,
-        "Content-Disposition": `attachment; filename="${fileName}"`,
-        "Content-Length": buffer.length.toString(),
-      },
-    });
-
-  } catch (error: any) {
-    console.error("Error:", error);
-    return new NextResponse("Error en el servidor", { status: 500 });
+    const response = NextResponse.redirect(downloadUrl, 307);
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
+  } catch (error) {
+    console.error("Secure download failed", error);
+    return new NextResponse("No pudimos preparar la descarga", { status: 500 });
   }
 }

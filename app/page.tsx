@@ -8,20 +8,20 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Comprar beats en Argentina | Trap, reggaetón y rap",
   description:
-    "Comprá beats originales de trap, reggaetón, drill, rap y R&B en Argentina. Licencias claras, precios en pesos y pago con Mercado Pago.",
+    "Comprá beats originales de trap, reggaetón, drill, rap y R&B en Argentina. Licencias claras, precios en pesos y entrega digital.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Comprar beats en Argentina | NOTYPE.LABS",
     description:
-      "Beats originales con licencias para artistas. Pagá en pesos con Mercado Pago y descargá tu instrumental.",
+      "Beats originales con licencias para artistas, precios en pesos y entrega digital.",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
     title: "Comprar beats en Argentina | NOTYPE.LABS",
-    description: "Beats originales con licencias y precios en pesos argentinos.",
+    description: "Beats originales con licencias, checkout online y precios en pesos argentinos.",
   },
 };
 

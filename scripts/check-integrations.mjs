@@ -1,0 +1,121 @@
+import { createClient } from "@supabase/supabase-js";
+import { HeadBucketCommand, S3Client } from "@aws-sdk/client-s3";
+
+function requireEnv(name) {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Falta la variable ${name}`);
+  }
+
+  return value;
+}
+
+async function checkSupabase() {
+  const client = createClient(
+    requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
+    requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
+    {
+      auth: {
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        persistSession: false,
+      },
+    },
+  );
+
+  const { count, error } = await client
+    .from("orders")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    throw new Error(`Supabase service role: ${error.message}`);
+  }
+
+  console.log(`✓ Supabase service role conectado (orders: ${count ?? 0})`);
+}
+
+async function checkUala() {
+  const environment = requireEnv("UALA_ENVIRONMENT");
+  const productionExplicitlyAllowed = process.argv.includes("--allow-production");
+
+  if (environment !== "test" && !(environment === "production" && productionExplicitlyAllowed)) {
+    throw new Error(
+      "El chequeo de producción requiere --allow-production para evitar usos accidentales.",
+    );
+  }
+
+  const authBaseUrl = environment === "production"
+    ? "https://auth.developers.ar.ua.la/v2/api"
+    : "https://auth.stage.developers.ar.ua.la/v2/api";
+  const response = await fetch(
+    `${authBaseUrl}/auth/token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        username: requireEnv("UALA_USERNAME"),
+        client_id: requireEnv("UALA_CLIENT_ID"),
+        client_secret_id: requireEnv("UALA_CLIENT_SECRET_ID"),
+        grant_type: "client_credentials",
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    let message = `HTTP ${response.status}`;
+
+    try {
+      const body = await response.json();
+      message = body.message ?? message;
+    } catch {
+      // Never print credentials or raw request data.
+    }
+
+    throw new Error(`Ualá v2 test: ${message}`);
+  }
+
+  const token = await response.json();
+
+  if (!token.access_token || !token.expires_in) {
+    throw new Error("Ualá v2 test devolvió una respuesta de token inválida");
+  }
+
+  console.log(
+    `✓ Ualá v2 ${environment} autenticado (token válido por ${token.expires_in} segundos)`,
+  );
+}
+
+async function checkR2() {
+  const client = new S3Client({
+    region: "auto",
+    endpoint: `https://${requireEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: requireEnv("R2_ACCESS_KEY_ID"),
+      secretAccessKey: requireEnv("R2_SECRET_ACCESS_KEY"),
+    },
+  });
+  const bucket = requireEnv("R2_BUCKET_NAME");
+  await client.send(new HeadBucketCommand({ Bucket: bucket }));
+  console.log(`✓ Cloudflare R2 lectura conectado (${bucket})`);
+}
+
+try {
+  const downloadSecret = requireEnv("DOWNLOAD_TOKEN_SECRET");
+  if (downloadSecret.length < 32) {
+    throw new Error("DOWNLOAD_TOKEN_SECRET debe contener al menos 32 caracteres");
+  }
+  console.log("✓ Secreto de descargas configurado");
+  await checkSupabase();
+  await checkR2();
+  await checkUala();
+  console.log("✓ Integraciones privadas verificadas sin crear órdenes ni pagos");
+} catch (error) {
+  console.error(
+    `✗ ${error instanceof Error ? error.message : "Error desconocido"}`,
+  );
+  process.exitCode = 1;
+}
