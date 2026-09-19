@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from 'react';
 import Link from "next/link";
 import { GENRES } from "@/lib/genres";
+import { GUIDES } from "@/lib/guides";
 
 // COMPONENTE PRINCIPAL CON SUSPENSE
 export default function HomeCatalog({ initialBeats }: { initialBeats: Beat[] }) {
@@ -240,6 +241,18 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
           <div className="flex flex-wrap gap-4 md:col-span-2">
             <Link href="/licenses" className="rounded-full bg-red-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-700">Comparar licencias</Link>
             <Link href="/faq" className="rounded-full border border-zinc-700 px-6 py-3 text-[10px] font-black uppercase tracking-widest hover:border-white">Cómo funciona la compra</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-20 md:px-8" aria-labelledby="guides-title">
+        <div className="mx-auto max-w-[1600px] border-t border-zinc-900 pt-14">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div><p className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-red-600">Antes de lanzar</p><h2 id="guides-title" className="text-3xl font-black uppercase italic tracking-tighter md:text-5xl">Recursos para artistas</h2></div>
+            <Link href="/guias" className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 hover:text-white">Ver todas las guías →</Link>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {GUIDES.map((guide) => <Link key={guide.slug} href={`/guias/${guide.slug}`} className="rounded-2xl border border-zinc-900 bg-zinc-950/50 p-6 transition-colors hover:border-red-600/60"><span className="text-[9px] font-black uppercase tracking-[0.25em] text-red-600">{guide.eyebrow}</span><h3 className="mt-3 text-xl font-black uppercase italic tracking-tight">{guide.title}</h3><p className="mt-4 text-sm leading-relaxed text-zinc-600">{guide.description}</p></Link>)}
           </div>
         </div>
       </section>
