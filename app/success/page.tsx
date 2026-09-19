@@ -1,10 +1,20 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import Link from 'next/link';
+import { trackEvent } from '@/lib/analytics';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('payment_id');
+
+  useEffect(() => {
+    if (!paymentId) return;
+    const storageKey = `purchase_tracked_${paymentId}`;
+    if (sessionStorage.getItem(storageKey)) return;
+    trackEvent('purchase', { transaction_id: paymentId, currency: 'ARS' });
+    sessionStorage.setItem(storageKey, 'true');
+  }, [paymentId]);
 
   // Si no hay ID, mostramos un mensaje de error en lugar de dejar la pantalla vacía
   if (!paymentId) {
@@ -12,7 +22,7 @@ function SuccessContent() {
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-10 bg-[#050505] text-white">
         <h1 className="text-2xl font-black italic uppercase tracking-tighter text-red-500 mb-4">Error de Verificación</h1>
         <p className="text-zinc-400 font-bold uppercase text-[9px] tracking-widest">No pudimos encontrar los datos de tu compra.</p>
-        <a href="/" className="mt-8 text-white text-[10px] font-black uppercase tracking-widest bg-zinc-900 px-8 py-3 rounded-full">Volver a la tienda</a>
+        <Link href="/#catalogo" className="mt-8 text-white text-[10px] font-black uppercase tracking-widest bg-zinc-900 px-8 py-3 rounded-full">Volver al catálogo</Link>
       </div>
     );
   }
@@ -24,12 +34,13 @@ function SuccessContent() {
       
       <a 
         href={`/api/download?payment_id=${paymentId}`}
+        onClick={() => trackEvent('file_download', { transaction_id: paymentId, file_type: 'licensed_beat' })}
         className="mt-8 inline-block bg-red-600 px-10 py-4 rounded-full font-black uppercase text-[10px] tracking-[0.2em] hover:bg-white hover:text-black transition-all"
       >
         Descargar Contenido
       </a>
 
-      <a href="/" className="mt-6 text-zinc-600 text-[9px] uppercase font-black hover:text-white transition-colors">Volver a la tienda</a>
+      <Link href="/#catalogo" className="mt-6 text-zinc-600 text-[9px] uppercase font-black hover:text-white transition-colors">Volver al catálogo</Link>
     </div>
   );
 }
