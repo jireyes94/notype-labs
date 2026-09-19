@@ -154,12 +154,15 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_MP_PUBLIC_KEY=
 NEXT_PUBLIC_URL=http://localhost:3000
+NEXT_PUBLIC_GA_MEASUREMENT_ID=
 
 MERCADOPAGO_ACCESS_TOKEN=
 GOOGLE_SERVICE_ACCOUNT_JSON=
 ```
 
 Do not commit real credentials or service-account data.
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` is optional. When it contains a GA4 measurement ID, the storefront reports page views, Core Web Vitals and the commercial events `play_start`, `select_item`, `view_license_options`, `begin_checkout`, `purchase`, `file_download` and `search`. Without it, analytics code remains inactive.
 
 Start the development server:
 
