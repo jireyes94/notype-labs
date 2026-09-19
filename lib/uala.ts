@@ -29,6 +29,22 @@ export type UalaCheckoutResponse = {
   };
 };
 
+export type UalaOrderStatus =
+  | "PENDING"
+  | "PROCESSED"
+  | "APPROVED"
+  | "REJECTED"
+  | "REFUNDED";
+
+export type UalaOrderResponse = {
+  uuid: string;
+  amount: number;
+  status: UalaOrderStatus;
+  external_reference: string;
+  created_date?: string;
+  updated_date?: string;
+};
+
 type CachedToken = {
   accessToken: string;
   expiresAt: number;
@@ -170,4 +186,38 @@ export async function createUalaCheckout(
   }
 
   return checkout;
+}
+
+export async function getUalaOrder(uuid: string): Promise<UalaOrderResponse> {
+  if (!/^[0-9a-f-]{36}$/i.test(uuid)) {
+    throw new Error("Invalid Ualá order UUID");
+  }
+
+  const environment = getEnvironment();
+  const accessToken = await getUalaAccessToken();
+  const response = await fetch(
+    `${UALA_URLS[environment].checkout}/orders/${encodeURIComponent(uuid)}`,
+    {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(await readProviderError(response));
+  }
+
+  const order = (await response.json()) as UalaOrderResponse;
+  if (
+    order.uuid !== uuid ||
+    !Number.isSafeInteger(order.amount) ||
+    !["PENDING", "PROCESSED", "APPROVED", "REJECTED", "REFUNDED"].includes(order.status)
+  ) {
+    throw new Error("Ualá returned an invalid order response");
+  }
+
+  return order;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
 import { formatArs, getLicense } from "@/lib/licenses";
@@ -12,6 +12,38 @@ export default function CheckoutPage() {
     email: "",
   });
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentFailed, setPaymentFailed] = useState(false);
+
+  useEffect(() => {
+    setPaymentFailed(new URLSearchParams(window.location.search).get("payment") === "failed");
+  }, []);
+
+  async function startPayment() {
+    if (isSubmitting) return;
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer,
+          items: items.map(({ slug, licenseId }) => ({ slug, licenseId })),
+        }),
+      });
+      const result = (await response.json()) as { checkoutUrl?: string; error?: string };
+      if (!response.ok || !result.checkoutUrl) {
+        throw new Error(result.error || "No pudimos iniciar el pago.");
+      }
+      window.location.assign(result.checkoutUrl);
+    } catch (paymentError) {
+      setError(paymentError instanceof Error ? paymentError.message : "No pudimos iniciar el pago.");
+      setIsSubmitting(false);
+    }
+  }
 
   if (!isHydrated) {
     return (
@@ -74,6 +106,11 @@ export default function CheckoutPage() {
             </p>
 
             <div className="mt-8 grid gap-5">
+              {paymentFailed && (
+                <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+                  El pago no se completó. Tu carrito sigue intacto para que puedas intentarlo otra vez.
+                </div>
+              )}
               <label className="grid gap-2">
                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
                   Nombre
@@ -129,13 +166,12 @@ export default function CheckoutPage() {
               </label>
             </div>
 
-            <div className="mt-8 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-              <p className="text-xs font-black uppercase tracking-widest text-amber-400">
-                Pago en configuración
+            <div className="mt-8 rounded-2xl border border-white/10 bg-black/50 p-5">
+              <p className="text-xs font-black uppercase tracking-widest text-white">
+                Pago seguro con Ualá Bis
               </p>
               <p className="mt-2 text-sm leading-relaxed text-zinc-500">
-                En el próximo paso conectaremos la nueva pasarela. Este botón
-                permanecerá deshabilitado hasta validar el flujo completo.
+                Al continuar vas a ingresar los datos de pago en el checkout seguro de Ualá. NOTYPE.LABS no almacena los datos de tu tarjeta.
               </p>
             </div>
           </section>
@@ -174,12 +210,19 @@ export default function CheckoutPage() {
               </span>
             </div>
 
+            {error && <p className="mt-5 text-sm text-red-400" role="alert">{error}</p>}
             <button
               type="button"
-              disabled
-              className="mt-6 w-full cursor-not-allowed rounded-full bg-zinc-800 px-6 py-4 text-xs font-black uppercase tracking-widest text-zinc-500"
+              onClick={startPayment}
+              disabled={
+                isSubmitting ||
+                customer.name.trim().length < 2 ||
+                !customer.email.includes("@") ||
+                !acceptedTerms
+              }
+              className="mt-6 w-full rounded-full bg-red-600 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
             >
-              Elegir medio de pago
+              {isSubmitting ? "Preparando pago..." : "Pagar con Ualá Bis"}
             </button>
           </aside>
         </div>
