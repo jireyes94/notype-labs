@@ -79,7 +79,7 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <div className="mx-auto max-w-[1600px]">
         <nav className="mb-8 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-white">Beats</Link> <span className="mx-2">/</span>
+          <Link href="/#catalogo" className="hover:text-white">Beats</Link> <span className="mx-2">/</span>
           <Link href="/generos" className="hover:text-white">Géneros</Link> <span className="mx-2">/</span>
           <span className="text-red-600">{genre.name}</span>
         </nav>
