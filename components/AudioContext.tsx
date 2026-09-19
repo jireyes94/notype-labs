@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export type Beat = {
   id?: number | string;
@@ -35,6 +36,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     } else {
       setCurrentBeat(beat);
       setIsPlaying(true);
+      trackEvent("play_start", {
+        beat_slug: beat.slug,
+        beat_title: beat.title,
+        genre: Array.isArray(beat.mood) ? beat.mood.join(", ") : beat.mood,
+      });
     }
   };
 
