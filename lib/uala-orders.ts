@@ -28,7 +28,7 @@ export async function reconcileUalaOrder(orderId: string, providerOrderId?: stri
   const providerOrder = await getUalaOrder(ualaId);
   if (
     providerOrder.external_reference !== order.external_reference ||
-    providerOrder.amount !== Number(order.total_cents)
+    providerOrder.amount !== Number(order.total_cents) / 100
   ) {
     throw new Error("Provider order integrity check failed");
   }

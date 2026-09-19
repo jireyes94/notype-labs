@@ -183,7 +183,7 @@ export async function createUalaCheckout(
     !checkout.uuid ||
     !checkout.links?.checkout_link ||
     checkout.external_reference !== input.externalReference ||
-    checkout.amount !== input.amountCents
+    checkout.amount !== input.amountCents / 100
   ) {
     throw new Error("Ualá returned an invalid checkout response");
   }
