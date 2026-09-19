@@ -25,6 +25,14 @@ export default function CheckoutPage() {
     setError(null);
     setIsSubmitting(true);
 
+    const paymentWindow = window.open("about:blank", "notype-uala-checkout");
+    if (!paymentWindow) {
+      setError("Habilitá las ventanas emergentes para abrir el pago seguro de Ualá Bis.");
+      setIsSubmitting(false);
+      return;
+    }
+    paymentWindow.opener = null;
+
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -38,8 +46,9 @@ export default function CheckoutPage() {
       if (!response.ok || !result.checkoutUrl) {
         throw new Error(result.error || "No pudimos iniciar el pago.");
       }
-      window.location.assign(result.checkoutUrl);
+      paymentWindow.location.replace(result.checkoutUrl);
     } catch (paymentError) {
+      paymentWindow.close();
       setError(paymentError instanceof Error ? paymentError.message : "No pudimos iniciar el pago.");
       setIsSubmitting(false);
     }

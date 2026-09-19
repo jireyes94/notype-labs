@@ -160,7 +160,9 @@ export async function createUalaCheckout(
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        amount: String(input.amountCents),
+        // Although the field reference calls this "cents", Ualá's v2 examples
+        // and checkout expect a decimal amount in ARS (for example "10.90").
+        amount: (input.amountCents / 100).toFixed(2),
         description: input.description,
         notification_url: input.notificationUrl,
         callback_fail: input.callbackFail,
@@ -180,7 +182,8 @@ export async function createUalaCheckout(
   if (
     !checkout.uuid ||
     !checkout.links?.checkout_link ||
-    checkout.external_reference !== input.externalReference
+    checkout.external_reference !== input.externalReference ||
+    checkout.amount !== input.amountCents
   ) {
     throw new Error("Ualá returned an invalid checkout response");
   }
