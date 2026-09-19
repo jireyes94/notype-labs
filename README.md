@@ -16,7 +16,7 @@ Notype Labs allows artists to:
 - Preview tracks through a persistent audio player
 - Explore beat information such as BPM, musical key and mood
 - Choose between different license tiers
-- Complete a purchase through Mercado Pago
+- Complete a purchase through Ualá Bis
 - Download the corresponding digital asset after payment verification
 
 The application also includes a restricted administration area for managing the catalog and its public assets.
@@ -48,29 +48,30 @@ The application also includes a restricted administration area for managing the 
 
 ### Payments and delivery
 
-- Mercado Pago Payment Brick integration
-- Wallet and card payment flows
+- Ualá Bis hosted checkout integration
+- Card payment flow in a separate secure tab
 - Server-side price calculation based on the stored beat
-- Payment metadata linking a purchase to a beat and license
-- Mercado Pago webhook endpoint
-- Payment-status verification before download
+- Private order snapshots linking each purchase to its beat and license
+- Idempotent Ualá webhook processing
+- Automatic payment-status reconciliation before download
 - License-aware delivery of MP3, WAV or ZIP assets
-- Google Drive integration using a service account
-- Supabase mapping between beats and downloadable assets
+- Expiring, limited download entitlements stored as token hashes
+- Direct private delivery from Cloudflare R2 through short-lived signed URLs
+- Supabase mapping between beats and R2 object keys
 
 ## Purchase and delivery flow
 
 ```mermaid
 flowchart TD
     A["Customer selects a license"] --> B["Next.js checkout route"]
-    B --> C["Mercado Pago"]
+    B --> C["Ualá Bis"]
     C --> D["Payment result"]
     D --> E["Server verifies payment"]
     E --> F["Supabase resolves asset"]
-    F --> G["Google Drive delivery"]
+    F --> G["Private R2 signed URL"]
 ```
 
-A download request is not authorized solely because the user reaches the success page. The backend retrieves the payment from Mercado Pago and confirms that its status is approved before resolving and returning the purchased asset.
+A download request is not authorized solely because the user reaches the success page. The backend reconciles the Ualá order, requires a paid local order and atomically consumes an expiring download entitlement before issuing a five-minute R2 URL.
 
 ## Technology stack
 
@@ -89,8 +90,9 @@ A download request is not authorized solely because the user reaches the success
 
 ### Integrations
 
-- Mercado Pago SDK and Payment Brick
-- Google Drive API
+- Ualá Bis API v2
+- Cloudflare R2 S3-compatible API
+- Google Drive API for offline migration tooling only
 - Vercel deployment
 
 ### Audio
@@ -106,9 +108,9 @@ Notype Labs uses the Next.js App Router and combines server-side API routes with
 app/
 ├── admin/                         # Authentication and catalog management
 ├── api/
-│   ├── checkout/                  # Mercado Pago preference and payment creation
+│   ├── checkout/                  # Ualá order and hosted-checkout creation
 │   ├── download/                  # Verified digital delivery
-│   └── webhooks/mercadopago/      # Payment notifications
+│   └── webhooks/uala/             # Payment notifications
 ├── beats/                         # Catalog and dynamic beat pages
 ├── success/                       # Post-payment experience
 └── legal and contact pages
@@ -123,11 +125,11 @@ public/                            # Static media and metadata assets
 The current application uses:
 
 - A `beats` table for catalog and commercial metadata
-- A `beat_assets` table for license-specific Google Drive file references
+- A `beat_assets` table for license-specific private R2 object keys
 - A `beats-assets` Supabase Storage bucket for public previews and covers
-- Mercado Pago metadata to preserve the relationship between payment, beat and license
+- Private order, item, payment-event and download-entitlement tables
 
-Database schema and security policies are managed outside this repository and must be configured separately.
+Reproducible database migrations and security policies live in `supabase/migrations`.
 
 ## Local development
 
@@ -136,8 +138,9 @@ Database schema and security policies are managed outside this repository and mu
 - Node.js 20 or later
 - npm
 - Supabase project
-- Mercado Pago application
-- Google Cloud service account with read access to the delivery files
+- Ualá Bis API v2 credentials
+- Private Cloudflare R2 bucket and read-only S3 credentials
+- Google Cloud service account only when running the legacy Drive migration tools
 
 ### Installation
 
@@ -152,11 +155,21 @@ Create a local `.env.local` file with the required configuration:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_MP_PUBLIC_KEY=
 NEXT_PUBLIC_URL=http://localhost:3000
 NEXT_PUBLIC_GA_MEASUREMENT_ID=
 
-MERCADOPAGO_ACCESS_TOKEN=
+SUPABASE_SERVICE_ROLE_KEY=
+UALA_ENVIRONMENT=test
+UALA_USERNAME=
+UALA_CLIENT_ID=
+UALA_CLIENT_SECRET_ID=
+R2_ACCOUNT_ID=
+R2_BUCKET_NAME=notype-labs-assets
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+DOWNLOAD_TOKEN_SECRET=
+
+# Offline asset audit/migration only
 GOOGLE_SERVICE_ACCOUNT_JSON=
 ```
 
@@ -179,6 +192,9 @@ npm run dev
 npm run build
 npm run start
 npm run lint
+npm run check:integrations
+npm run check:asset-sizes
+npm run migrate:assets:r2
 ```
 
 ## Known limitations
@@ -189,9 +205,7 @@ Current technical limitations include:
 
 - No automated unit, integration or end-to-end test suite
 - No continuous integration pipeline
-- Limited webhook processing beyond payment verification and logging
 - No automated email-delivery workflow
-- No documented database migrations or reproducible schema setup
 - Administration security depends on external Supabase configuration and policies
 - Limited observability and structured error reporting
 - Some frontend and API types still require stricter validation
@@ -204,11 +218,12 @@ These limitations are documented intentionally and define the next engineering s
 - [x] Add persistent audio playback
 - [x] Integrate Supabase catalog, authentication and storage
 - [x] Build the administration dashboard
-- [x] Integrate Mercado Pago checkout
+- [x] Integrate Ualá Bis v2 hosted checkout
 - [x] Verify approved payments before digital delivery
-- [x] Deliver license-specific assets from Google Drive
+- [x] Deliver license-specific assets privately from Cloudflare R2
+- [x] Add reproducible order and download database migrations
 - [x] Add legal and contact pages
-- [ ] Add reproducible database migrations and seed data
+- [ ] Add catalog seed data
 - [ ] Introduce schema validation for API inputs
 - [ ] Add unit and integration tests
 - [ ] Add Playwright end-to-end purchase scenarios
