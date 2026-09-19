@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabase'; // Importa tu cliente de supabase
 import { SITE_URL } from '@/lib/site';
+import { GENRES } from '@/lib/genres';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,10 +9,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
 
   // Páginas estáticas
-  const routes = ['', '/licenses', '/contact', '/terms', '/privacy', '/refund'].map((route) => ({
+  const routes = ['', '/generos', '/licenses', '/faq', '/contact', '/terms', '/privacy', '/refund'].map((route) => ({
     url: `${baseUrl}${route}`,
     changeFrequency: 'monthly' as const,
-    priority: route === '' ? 1 : 0.5,
+    priority: route === '' ? 1 : ['/generos', '/licenses'].includes(route) ? 0.8 : 0.5,
+  }));
+
+  const genreRoutes = GENRES.map((genre) => ({
+    url: `${baseUrl}/generos/${genre.slug}`,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
   }));
 
   // Consultar beats dinámicamente de Supabase
@@ -31,5 +38,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...routes, ...beatRoutes];
+  return [...routes, ...genreRoutes, ...beatRoutes];
 }
