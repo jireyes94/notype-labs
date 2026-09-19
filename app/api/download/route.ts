@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { google } from "googleapis";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { hashDownloadToken } from "@/lib/download-entitlements";
+import { getR2Bucket, getR2Client } from "@/lib/r2";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 type ConsumedDownload = {
@@ -8,11 +10,8 @@ type ConsumedDownload = {
   beat_id: number;
   beat_title: string;
   license_id: "mp3" | "wav" | "unlimited";
+  r2_object_key: string;
 };
-
-function safeFileName(value: string): string {
-  return value.normalize("NFKD").replace(/[^a-zA-Z0-9_-]+/g, "_").replace(/^_+|_+$/g, "");
-}
 
 export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("token");
@@ -31,46 +30,17 @@ export async function GET(request: Request) {
       return new NextResponse("El enlace venció o alcanzó su límite de descargas", { status: 403 });
     }
 
-    const { data: assets, error: assetsError } = await admin
-      .from("beat_assets")
-      .select("drive_mp3_id, drive_wav_id, drive_unlimited_id")
-      .eq("beat_id", consumed.beat_id)
-      .single();
-    if (assetsError || !assets) {
-      return new NextResponse("Archivo no configurado", { status: 404 });
-    }
-
-    const asset = {
-      mp3: { id: assets.drive_mp3_id, extension: "mp3", contentType: "audio/mpeg" },
-      wav: { id: assets.drive_wav_id, extension: "wav", contentType: "audio/wav" },
-      unlimited: { id: assets.drive_unlimited_id, extension: "zip", contentType: "application/zip" },
-    }[consumed.license_id];
-    if (!asset?.id) return new NextResponse("Archivo no configurado", { status: 404 });
-
-    const credentialsRaw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-    if (!credentialsRaw) throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_JSON");
-    const credentials = JSON.parse(credentialsRaw.trim().replace(/^'|'$/g, ""));
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-    });
-    const drive = google.drive({ version: "v3", auth });
-    const response = await drive.files.get(
-      { fileId: asset.id, alt: "media" },
-      { responseType: "arraybuffer" },
+    const downloadUrl = await getSignedUrl(
+      getR2Client(),
+      new GetObjectCommand({
+        Bucket: getR2Bucket(),
+        Key: consumed.r2_object_key,
+      }),
+      { expiresIn: 300 },
     );
-    const buffer = Buffer.from(response.data as ArrayBuffer);
-    const fileName = `${safeFileName(consumed.beat_title) || "beat"}_${consumed.license_id}.${asset.extension}`;
-
-    return new NextResponse(buffer, {
-      headers: {
-        "Cache-Control": "private, no-store",
-        "Content-Disposition": `attachment; filename="${fileName}"`,
-        "Content-Length": buffer.length.toString(),
-        "Content-Type": asset.contentType,
-        "X-Content-Type-Options": "nosniff",
-      },
-    });
+    const response = NextResponse.redirect(downloadUrl, 307);
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
   } catch (error) {
     console.error("Secure download failed", error);
     return new NextResponse("No pudimos preparar la descarga", { status: 500 });

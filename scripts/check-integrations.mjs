@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { HeadBucketCommand, S3Client } from "@aws-sdk/client-s3";
 
 function requireEnv(name) {
   const value = process.env[name];
@@ -84,6 +85,20 @@ async function checkUala() {
   );
 }
 
+async function checkR2() {
+  const client = new S3Client({
+    region: "auto",
+    endpoint: `https://${requireEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: requireEnv("R2_ACCESS_KEY_ID"),
+      secretAccessKey: requireEnv("R2_SECRET_ACCESS_KEY"),
+    },
+  });
+  const bucket = requireEnv("R2_BUCKET_NAME");
+  await client.send(new HeadBucketCommand({ Bucket: bucket }));
+  console.log(`✓ Cloudflare R2 lectura conectado (${bucket})`);
+}
+
 try {
   const downloadSecret = requireEnv("DOWNLOAD_TOKEN_SECRET");
   if (downloadSecret.length < 32) {
@@ -91,6 +106,7 @@ try {
   }
   console.log("✓ Secreto de descargas configurado");
   await checkSupabase();
+  await checkR2();
   await checkUala();
   console.log("✓ Integraciones privadas verificadas sin crear órdenes ni pagos");
 } catch (error) {
