@@ -39,7 +39,9 @@ export async function reconcileUalaOrder(orderId: string, providerOrderId?: stri
     provider_status: providerOrder.status,
     provider_order_id: providerOrder.uuid,
   };
-  if (status === "paid") update.paid_at = new Date().toISOString();
+  if (status === "paid" && order.status !== "paid") {
+    update.paid_at = new Date().toISOString();
+  }
 
   const { error: updateError } = await admin.from("orders").update(update).eq("id", order.id);
   if (updateError) throw updateError;
