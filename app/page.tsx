@@ -18,6 +18,11 @@ export const metadata: Metadata = {
       "Beats originales con licencias para artistas. Pagá en pesos con Mercado Pago y descargá tu instrumental.",
     url: "/",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Comprar beats en Argentina | NOTYPE.LABS",
+    description: "Beats originales con licencias y precios en pesos argentinos.",
+  },
 };
 
 async function getBeats(): Promise<Beat[]> {
