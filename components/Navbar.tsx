@@ -15,8 +15,8 @@ export default function Navbar() {
   // Simplificamos los links según tu nueva estrategia
   const links = [
     { name: "Géneros", path: "/generos" },
+    { name: "Guías", path: "/guias" },
     { name: "Licencias", path: "/licenses" },
-    { name: "FAQ", path: "/faq" },
   ];
 
   useEffect(() => {
