@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 import Link from "next/link";
 import { GENRES } from "@/lib/genres";
 import { GUIDES } from "@/lib/guides";
+import { trackEvent } from "@/lib/analytics";
 
 // COMPONENTE PRINCIPAL CON SUSPENSE
 export default function HomeCatalog({ initialBeats }: { initialBeats: Beat[] }) {
@@ -57,6 +58,15 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
   }, [beats, searchTerm, hideSold]);
 
   const displayedBeats = filteredBeats.slice(0, visibleBeats);
+
+  useEffect(() => {
+    const normalizedSearch = searchTerm.trim();
+    if (normalizedSearch.length < 2) return;
+    const timeout = window.setTimeout(() => {
+      trackEvent("search", { search_term: normalizedSearch, results_count: filteredBeats.length });
+    }, 700);
+    return () => window.clearTimeout(timeout);
+  }, [searchTerm, filteredBeats.length]);
 
   useEffect(() => {
     if (filteredBeats.length <= visibleBeats) return;

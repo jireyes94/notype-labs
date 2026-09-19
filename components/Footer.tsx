@@ -25,7 +25,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-[11px] font-black uppercase tracking-[0.4em] mb-8">Navegacion</h4>
             <ul className="space-y-4">
-              <li><Link href="/" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Beats</Link></li>
+              <li><Link href="/#catalogo" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Beats</Link></li>
               <li><Link href="/generos" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Géneros</Link></li>
               <li><Link href="/guias" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Guías para artistas</Link></li>
               <li><Link href="/licenses" className="text-zinc-400 hover:text-red-600 text-[10px] font-bold uppercase tracking-widest transition-colors">Licencias</Link></li>

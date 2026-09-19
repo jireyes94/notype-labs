@@ -65,7 +65,7 @@ export default function Hero() {
 
         <div className="flex justify-center gap-4">
           <Link
-            href="/"
+            href="/#catalogo"
             className="px-8 py-4 rounded-xl bg-white text-black font-semibold 
               hover:scale-105 transition-all duration-300 shadow-lg"
           >

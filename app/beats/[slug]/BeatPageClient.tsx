@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+import { trackEvent } from "@/lib/analytics";
 initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
 export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
@@ -31,6 +32,16 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
     };
     checkAdmin();
   }, []);
+
+  useEffect(() => {
+    trackEvent("view_item", {
+      item_id: beatFromDB.slug,
+      item_name: beatFromDB.title,
+      price: beatFromDB.price,
+      currency: "ARS",
+    });
+    trackEvent("view_license_options", { item_id: beatFromDB.slug, item_name: beatFromDB.title, source: "beat_page" });
+  }, [beatFromDB.slug, beatFromDB.title, beatFromDB.price]);
 
   const generateSlug = (title: string) => {
     return title.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w ]+/g, '').replace(/ +/g, '-');
@@ -83,6 +94,13 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
   };
 
   const handleBuy = (licenseType: string) => {
+    trackEvent("begin_checkout", {
+      item_id: beatFromDB.slug,
+      item_name: editData.title,
+      license_type: licenseType,
+      source: "beat_page_whatsapp",
+      currency: "ARS",
+    });
     const phoneNumber = "5492214379913";
     const message = `Hola! Me contacto para adquirir la licencia *${licenseType}* de *${editData.title}*.`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
@@ -113,7 +131,7 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
         
         <div className="mb-4">
           <Link 
-        href="/" 
+        href="/#catalogo"
         className="group inline-flex items-center gap-2 mb-8 text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-500 hover:text-red-600 transition-all"
       >
         <svg 
@@ -208,7 +226,7 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
                   </p>
                   <div className="pt-4">
                     <Link
-                      href="/"
+                      href="/#catalogo"
                       className="text-white text-[10px] font-black uppercase tracking-widest border-b border-white hover:text-red-500 hover:border-red-500 transition-all"
                     >
                       Explorar otros beats

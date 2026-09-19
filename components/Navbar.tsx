@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/");
+    router.push("/#catalogo");
     router.refresh();
   };
 
@@ -148,7 +148,7 @@ export default function Navbar() {
         {/* Link de Beats agregado para regresar al catálogo */}
         <div className="flex flex-col gap-6 text-center">
           <Link 
-            href="/" 
+            href="/#catalogo"
             onClick={() => setIsOpen(false)}
             className={`text-4xl font-black uppercase italic tracking-tighter ${pathname === '/' ? 'text-red-600' : 'text-white'}`}
           >

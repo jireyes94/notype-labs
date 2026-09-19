@@ -4,6 +4,7 @@ import { useAudio, Beat } from "./AudioContext";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
+import { trackEvent } from "@/lib/analytics";
 
 initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
 
@@ -35,9 +36,10 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
       if (session) setIsAdmin(true);
     };
     checkAdmin();
+    trackEvent("view_license_options", { item_id: beat.slug, item_name: beat.title, source: "beat_modal" });
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = 'auto'; };
-  }, []);
+  }, [beat.slug, beat.title]);
 
   const handleSave = async () => {
     setLoading(true);
@@ -61,6 +63,13 @@ export default function BeatModal({ beat, onClose }: { beat: Beat; onClose: () =
   };
 
   const buy = async (license: string, price: number) => {
+    trackEvent("begin_checkout", {
+      item_id: beat.slug,
+      item_name: beat.title,
+      license_type: license,
+      value: price,
+      currency: "ARS",
+    });
     setLoading(true);
     setPaymentError(null);
     setPreferenceId(null);

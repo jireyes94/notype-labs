@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AudioPlayer from "@/components/AudioPlayer";
 import { SITE_URL } from "@/lib/site";
+import Analytics from "@/components/Analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es-AR" className="bg-black">
       {/* Volvemos a un body normal que crece con su contenido */}
       <body className="antialiased min-h-screen bg-black text-white flex flex-col">
+        <Analytics />
         <AudioProvider>
           <Navbar />
           
