@@ -71,7 +71,7 @@ flowchart TD
     F --> G["Private R2 signed URL"]
 ```
 
-A download request is not authorized solely because the user reaches the success page. The backend reconciles the Ualá order, requires a paid local order and atomically consumes an expiring download entitlement before issuing a five-minute R2 URL.
+A download request is not authorized solely because the user reaches the success page. The backend reconciles the Ualá order, treats Ualá's `PROCESSED` customer-charge status (and the later `APPROVED` disbursement status) as paid, and atomically consumes an expiring download entitlement before issuing a five-minute R2 URL.
 
 ## Technology stack
 

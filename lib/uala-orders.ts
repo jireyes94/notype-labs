@@ -6,7 +6,10 @@ import { ensureOrderDownloads } from "@/lib/download-entitlements";
 
 const LOCAL_STATUS: Record<UalaOrderStatus, string> = {
   PENDING: "payment_pending",
-  PROCESSED: "processed",
+  // Ualá emits PROCESSED after successfully charging the customer. APPROVED
+  // is the later merchant-disbursement confirmation, so waiting for it would
+  // leave an already charged buyer without the purchased files.
+  PROCESSED: "paid",
   APPROVED: "paid",
   REJECTED: "rejected",
   REFUNDED: "refunded",
