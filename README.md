@@ -39,7 +39,9 @@ The application also includes a restricted administration area for managing the 
 - Authentication with Supabase Auth
 - Restricted administration dashboard
 - Beat creation and catalog listing
-- MP3 preview and cover-image uploads
+- Direct MP3 preview and cover-image uploads
+- Direct private MP3, WAV and Unlimited ZIP uploads to Cloudflare R2
+- Server-side administrator authorization for every catalog mutation
 - File-size validation
 - Automatic slug generation
 - Duplicate-slug validation
@@ -167,13 +169,35 @@ R2_ACCOUNT_ID=
 R2_BUCKET_NAME=notype-labs-assets
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
+R2_ADMIN_ACCESS_KEY_ID=
+R2_ADMIN_SECRET_ACCESS_KEY=
 DOWNLOAD_TOKEN_SECRET=
+ADMIN_USER_ID=
 
 # Offline asset audit/migration only
 GOOGLE_SERVICE_ACCOUNT_JSON=
 ```
 
 Do not commit real credentials or service-account data.
+
+`R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` are read-only delivery credentials. The separate `R2_ADMIN_*` pair must be scoped to the assets bucket with object read/write access and is used only to create short-lived upload URLs, verify new objects and remove assets from deleted beats.
+
+Browser uploads through presigned R2 URLs require this bucket CORS policy (add the final production origin and localhost; do not include a trailing slash):
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "https://notypelabs.vercel.app"
+    ],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["Content-Type"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
 
 `NEXT_PUBLIC_GA_MEASUREMENT_ID` is optional. When it contains a GA4 measurement ID, the storefront reports page views, Core Web Vitals and the commercial events `play_start`, `select_item`, `view_license_options`, `begin_checkout`, `purchase`, `file_download` and `search`. Without it, analytics code remains inactive.
 
