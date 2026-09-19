@@ -27,7 +27,7 @@ export default function RelatedBeats({ beats }: { beats: RelatedBeat[] }) {
               Beats relacionados
             </h2>
           </div>
-          <Link href="/" className="hidden text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white sm:block">
+          <Link href="/#catalogo" className="hidden text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white sm:block">
             Ver catálogo completo
           </Link>
         </div>
@@ -62,7 +62,7 @@ export default function RelatedBeats({ beats }: { beats: RelatedBeat[] }) {
           ))}
         </div>
 
-        <Link href="/" className="mt-8 inline-block text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white sm:hidden">
+        <Link href="/#catalogo" className="mt-8 inline-block text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white sm:hidden">
           Ver catálogo completo
         </Link>
       </div>
