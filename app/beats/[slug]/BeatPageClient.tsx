@@ -5,15 +5,24 @@ import { useAudio, Beat } from "@/components/AudioContext";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { trackEvent } from "@/lib/analytics";
-initMercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!);
+import { useCart } from "@/components/CartContext";
+import {
+  BEAT_LICENSES,
+  calculateLicensePrice,
+  formatArs,
+  type LicenseId,
+} from "@/lib/licenses";
 
 export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
   const { playBeat, currentBeat } = useAudio();
+  const { addItem } = useCart();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedLicenseId, setSelectedLicenseId] =
+    useState<LicenseId>("wav");
+  const [wasAddedToCart, setWasAddedToCart] = useState(false);
   const router = useRouter();
 
   const [editData, setEditData] = useState({
@@ -93,17 +102,38 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
     });
   };
 
-  const handleBuy = (licenseType: string) => {
-    trackEvent("begin_checkout", {
+  const handleLicenseSelection = (licenseId: LicenseId) => {
+    setSelectedLicenseId(licenseId);
+    setWasAddedToCart(false);
+  };
+
+  const handleAddToCart = () => {
+    const basePrice = Number(editData.price);
+    const selectedLicense = BEAT_LICENSES.find(
+      ({ id }) => id === selectedLicenseId,
+    );
+
+    addItem(
+      {
+        id: beatFromDB.id,
+        slug: beatFromDB.slug,
+        title: editData.title,
+        coverUrl: beatFromDB.cover_url,
+        basePrice,
+      },
+      selectedLicenseId,
+    );
+
+    trackEvent("add_to_cart", {
       item_id: beatFromDB.slug,
       item_name: editData.title,
-      license_type: licenseType,
-      source: "beat_page_whatsapp",
+      license_type: selectedLicense?.name,
+      price: calculateLicensePrice(basePrice, selectedLicenseId),
       currency: "ARS",
+      source: "beat_page",
     });
-    const phoneNumber = "5492214379913";
-    const message = `Hola! Me contacto para adquirir la licencia *${licenseType}* de *${editData.title}*.`;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+
+    setWasAddedToCart(true);
   };
 
   useEffect(() => {
@@ -238,45 +268,70 @@ export default function BeatPageClient({ beatFromDB }: { beatFromDB: Beat }) {
                   <h3 className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em] mb-8 text-center">Seleccionar Licencia</h3>
 
                   <div className="grid gap-4">
-                    {/* MP3 Lease */}
-                    <button 
-                      onClick={() => handleBuy("MP3 Lease")}
-                      className="flex items-center justify-between p-5 bg-zinc-900/50 border border-zinc-800 rounded-2xl hover:border-red-600 transition-all text-left group"
-                    >
-                      <div>
-                        <p className="font-black text-sm uppercase group-hover:text-red-500 transition-colors italic">MP3 Lease</p>
-                        <p className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Uso limitado</p>
-                      </div>
-                      <span className="font-black text-xl italic">${Number(editData.price).toLocaleString('es-AR')}</span>
-                    </button>
-              
-                    {/* WAV Premium */}
-                    <button 
-                      onClick={() => handleBuy("WAV Premium")}
-                      className="flex items-center justify-between p-5 bg-red-600 rounded-2xl hover:bg-red-700 transition-all text-left shadow-[0_0_30px_rgba(220,38,38,0.2)]"
-                    >
-                      <div>
-                        <p className="font-black text-sm uppercase text-white italic">WAV Premium</p>
-                        <p className="text-[9px] text-red-100 uppercase font-black tracking-widest">Alta calidad</p>
-                      </div>
-                      <span className="font-black text-xl text-white italic">${(Number(editData.price) * 1.5).toLocaleString('es-AR')}</span>
-                    </button>
-              
-                    {/* Unlimited */}
-                    <button 
-                      onClick={() => handleBuy("Unlimited")}
-                      className="flex items-center justify-between p-5 bg-zinc-900/50 border border-zinc-800 rounded-2xl hover:border-red-600 transition-all text-left group"
-                    >
-                      <div>
-                        <p className="font-black text-sm uppercase group-hover:text-red-500 transition-colors italic">Unlimited</p>
-                        <p className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Uso ilimitado / Stems</p>
-                      </div>
-                      <span className="font-black text-xl italic">${(Number(editData.price) * 4).toLocaleString('es-AR')}</span>
-                    </button>
+                    {BEAT_LICENSES.map((license) => {
+                      const isSelected = selectedLicenseId === license.id;
+                      const price = calculateLicensePrice(
+                        Number(editData.price),
+                        license.id,
+                      );
+
+                      return (
+                        <button
+                          type="button"
+                          key={license.id}
+                          onClick={() => handleLicenseSelection(license.id)}
+                          aria-pressed={isSelected}
+                          className={`group flex items-center justify-between rounded-2xl border p-5 text-left transition-all ${
+                            isSelected
+                              ? "border-red-600 bg-red-600 shadow-[0_0_30px_rgba(220,38,38,0.2)]"
+                              : "border-zinc-800 bg-zinc-900/50 hover:border-red-600"
+                          }`}
+                        >
+                          <div>
+                            <p
+                              className={`text-sm font-black uppercase italic transition-colors ${
+                                isSelected
+                                  ? "text-white"
+                                  : "group-hover:text-red-500"
+                              }`}
+                            >
+                              {license.name}
+                            </p>
+                            <p
+                              className={`text-[9px] font-bold uppercase tracking-widest ${
+                                isSelected ? "text-red-100" : "text-zinc-500"
+                              }`}
+                            >
+                              {license.description}
+                            </p>
+                          </div>
+                          <span className="text-xl font-black italic">
+                            {formatArs(price)}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
-              
-                  <p className="text-center text-zinc-600 text-[9px] uppercase font-bold tracking-widest mt-8">
-                    Entrega instantánea vía WhatsApp
+
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="mt-6 w-full rounded-full bg-white px-6 py-4 text-xs font-black uppercase tracking-widest text-black transition-colors hover:bg-red-600 hover:text-white"
+                  >
+                    {wasAddedToCart ? "Agregado al carrito" : "Agregar al carrito"}
+                  </button>
+
+                  {wasAddedToCart ? (
+                    <Link
+                      href="/cart"
+                      className="mt-3 flex w-full justify-center rounded-full border border-white/20 px-6 py-4 text-xs font-black uppercase tracking-widest text-white transition-colors hover:border-red-600 hover:text-red-500"
+                    >
+                      Ver carrito
+                    </Link>
+                  ) : null}
+
+                  <p className="mt-6 text-center text-[9px] font-bold uppercase tracking-widest text-zinc-600">
+                    Podés cambiar la licencia desde esta ficha antes de agregarla
                   </p>
                 </>
               )}
