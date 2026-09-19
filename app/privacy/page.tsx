@@ -15,7 +15,7 @@ export default function PrivacidadPage() {
           <div className="p-8 border border-zinc-800 bg-zinc-900/50 rounded-2xl">
             <h2 className="text-xl font-bold uppercase text-red-600 mb-4">Recopilación de Información</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Solo solicitamos la información necesaria para procesar tu compra y enviarte los archivos: nombre, correo electrónico y datos de facturación. No almacenamos datos sensibles de tarjetas de crédito; toda transacción se procesa de forma segura a través de <strong>MercadoPago</strong>.
+              Solo solicitamos la información necesaria para procesar tu compra y enviarte los archivos: nombre, correo electrónico y datos de facturación. No almacenamos datos sensibles de tarjetas de crédito; toda transacción se procesa de forma segura a través de <strong>Ualá Bis</strong>.
             </p>
           </div>
 

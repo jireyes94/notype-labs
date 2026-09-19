@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useMemo } from "react";
 import BeatCard from "@/components/BeatCard";
-import BeatModal from "@/components/BeatModal";
 import { Beat } from "@/components/AudioContext";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from 'react';
@@ -27,7 +26,6 @@ export default function HomeCatalog({ initialBeats }: { initialBeats: Beat[] }) 
 function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
   const searchParams = useSearchParams();
   const querySearch = searchParams.get("search");
-  const [selectedBeat, setSelectedBeat] = useState<Beat | null>(null);
   const [beats] = useState<Beat[]>(initialBeats);
   const [searchTerm, setSearchTerm] = useState(querySearch ?? "");
   const [hideSold, setHideSold] = useState(false);
@@ -102,12 +100,12 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
               Sonido Exclusivo
             </span>
             <h1 className="text-5xl md:text-8xl lg:text-9xl font-black uppercase italic tracking-tighter leading-[0.9] max-w-5xl drop-shadow-2xl">
-              Comprar <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500">beats</span> <br />
-              <span className="text-white">en Argentina</span>
+              Encontrá el <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500">beat</span> para tu <br />
+              <span className="text-white">próxima canción</span>
             </h1>
             <p className="mt-8 max-w-2xl text-sm font-medium leading-relaxed text-zinc-300 md:text-base">
-              Instrumentales originales para artistas. Escuchá el catálogo, elegí tu licencia y pagá en pesos argentinos.
+              Instrumentales originales de trap, reggaetón, drill, rap y R&B. Elegí tu licencia y pagá en pesos.
             </p>
           </div>
         </div>
@@ -201,7 +199,7 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {displayedBeats.map((beat) => (
-                <BeatCard key={beat.id} beat={beat} onBuy={(b) => setSelectedBeat(b)} />
+                <BeatCard key={beat.id} beat={beat} />
               ))}
             </div>
           )}
@@ -244,7 +242,7 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
-            {["Pago online con Mercado Pago", "Precios expresados en ARS", "Soporte desde Argentina"].map((item) => (
+            {["Compra directa online", "Precios expresados en ARS", "Soporte desde Argentina"].map((item) => (
               <div key={item} className="rounded-2xl border border-zinc-900 bg-black px-5 py-4 text-xs font-bold uppercase tracking-wider text-zinc-300">✓ {item}</div>
             ))}
           </div>
@@ -266,11 +264,6 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
           </div>
         </div>
       </section>
-
-      {/* Modales */}
-      {selectedBeat && (
-        <BeatModal beat={selectedBeat} onClose={() => setSelectedBeat(null)} />
-      )}
     </main>
   );
 }
