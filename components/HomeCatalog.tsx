@@ -8,22 +8,23 @@ import Link from "next/link";
 import { GENRES } from "@/lib/genres";
 import { GUIDES } from "@/lib/guides";
 import { trackEvent } from "@/lib/analytics";
+import PromotionalBeats from "@/components/PromotionalBeats";
 
 // COMPONENTE PRINCIPAL CON SUSPENSE
-export default function HomeCatalog({ initialBeats }: { initialBeats: Beat[] }) {
+export default function HomeCatalog({ initialBeats, promotionalBeats }: { initialBeats: Beat[]; promotionalBeats: Beat[] }) {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
       </div>
     }>
-      <HomeContent initialBeats={initialBeats} />
+      <HomeContent initialBeats={initialBeats} promotionalBeats={promotionalBeats} />
     </Suspense>
   );
 }
 
 // TU CÓDIGO ORIGINAL SIN CAMBIAR NI UNA COMA
-function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
+function HomeContent({ initialBeats, promotionalBeats }: { initialBeats: Beat[]; promotionalBeats: Beat[] }) {
   const searchParams = useSearchParams();
   const querySearch = searchParams.get("search");
   const [beats] = useState<Beat[]>(initialBeats);
@@ -109,6 +110,8 @@ function HomeContent({ initialBeats }: { initialBeats: Beat[] }) {
             </p>
           </div>
         </div>
+
+        <PromotionalBeats beats={promotionalBeats} />
 
         {/* 2. BARRA DE CONTROL (Integrada sobre el Hero) */}
         <div className="relative z-[40] px-4 md:px-8">
