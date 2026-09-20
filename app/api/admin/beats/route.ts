@@ -29,20 +29,30 @@ function publicStoragePath(url: unknown): string | null {
 
 async function removeObjects(r2Keys: string[], storagePaths: string[]) {
   const admin = getSupabaseAdmin();
+  const errors: string[] = [];
   if (storagePaths.length) {
     const { error } = await admin.storage.from("beats-assets").remove(storagePaths);
-    if (error) console.error("Could not remove public beat assets", error);
+    if (error) {
+      console.error("Could not remove public beat assets", error);
+      errors.push("supabase_storage");
+    }
   }
   if (r2Keys.length) {
     try {
-      await getR2AdminClient().send(new DeleteObjectsCommand({
+      const result = await getR2AdminClient().send(new DeleteObjectsCommand({
         Bucket: getR2Bucket(),
         Delete: { Objects: r2Keys.map((Key) => ({ Key })), Quiet: true },
       }));
+      if (result.Errors?.length) {
+        console.error("Could not remove some private beat assets", result.Errors);
+        errors.push("r2");
+      }
     } catch (error) {
       console.error("Could not remove private beat assets", error);
+      errors.push("r2");
     }
   }
+  return { complete: errors.length === 0, errors };
 }
 
 export async function GET(request: Request) {
@@ -215,8 +225,12 @@ export async function DELETE(request: Request) {
     const r2Keys = (assets ?? []).flatMap((asset) =>
       [asset.r2_mp3_key, asset.r2_wav_key, asset.r2_unlimited_key].filter((value): value is string => Boolean(value)),
     );
-    await removeObjects(r2Keys, storagePaths);
-    return NextResponse.json({ deleted: ids.length });
+    const cleanup = await removeObjects(r2Keys, storagePaths);
+    return NextResponse.json({
+      deleted: ids.length,
+      cleanupComplete: cleanup.complete,
+      cleanupErrors: cleanup.errors,
+    });
   } catch (error) {
     const authResponse = adminErrorResponse(error);
     if (authResponse) return authResponse;
