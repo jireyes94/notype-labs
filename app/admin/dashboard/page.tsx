@@ -40,7 +40,12 @@ export default function AdminDashboard() {
       ...init,
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, ...init.headers },
     });
-    const result = await response.json() as { error?: string; beats?: Beat[] };
+    const result = await response.json() as {
+      error?: string;
+      beats?: Beat[];
+      cleanupComplete?: boolean;
+      cleanupErrors?: string[];
+    };
     if (!response.ok) throw new Error(result.error ?? "La operación falló.");
     return result;
   }, [accessToken]);
@@ -155,9 +160,12 @@ export default function AdminDashboard() {
     if (!selectedIds.length || !confirm(`¿Borrar permanentemente ${selectedIds.length} beat(s) y sus archivos?`)) return;
     setUploading(true);
     try {
-      await adminRequest("/api/admin/beats", { method: "DELETE", body: JSON.stringify({ ids: selectedIds }) });
+      const result = await adminRequest("/api/admin/beats", { method: "DELETE", body: JSON.stringify({ ids: selectedIds }) });
       setSelectedIds([]);
       await fetchBeats();
+      if (result.cleanupComplete === false) {
+        alert("El beat se eliminó del catálogo, pero algunos archivos no pudieron limpiarse. Revisá los logs antes de continuar.");
+      }
     } catch (error) {
       alert(errorMessage(error));
     } finally {
