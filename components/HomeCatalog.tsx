@@ -270,16 +270,16 @@ function HomeContent({ initialBeats, promotionalBeats }: { initialBeats: Beat[];
       </section>
 
       <section className="px-4 pb-20 md:px-8" aria-labelledby="plugins-title">
-        <div className="mx-auto grid max-w-[1600px] overflow-hidden rounded-3xl border border-zinc-900 bg-zinc-950/50 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="flex flex-col justify-center p-8 md:p-12">
+        <div className="mx-auto grid max-w-[1180px] overflow-hidden rounded-3xl border border-zinc-900 bg-zinc-950/50 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-10">
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-red-600">NOTYPE.REF · Audio tools</p>
-            <h2 id="plugins-title" className="mt-5 max-w-3xl text-4xl font-black uppercase italic leading-none tracking-tighter md:text-6xl">Plugins para terminar mejor tus voces</h2>
-            <p className="mt-6 max-w-2xl text-sm leading-relaxed text-zinc-400 md:text-base">MicModeler y Pure Type son plugins VST3 para Windows creados para productores y artistas que graban en home studios. Corrección, carácter y acabado vocal desde USD 0.99.</p>
+            <h2 id="plugins-title" className="mt-5 max-w-3xl text-4xl font-black uppercase italic leading-none tracking-tighter md:text-6xl lg:text-5xl">Plugins para terminar mejor tus voces</h2>
+            <p className="mt-6 max-w-2xl text-sm leading-relaxed text-zinc-400 md:text-base lg:text-sm">MicModeler y Pure Type son plugins VST3 para Windows creados para productores y artistas que graban en home studios. Corrección, carácter y acabado vocal desde USD 0.99.</p>
             <div className="mt-8 flex flex-wrap gap-3"><Link href="/plugins" className="rounded-full bg-red-600 px-7 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:bg-red-700">Explorar plugins</Link><Link href="/en/plugins" hrefLang="en" className="rounded-full border border-zinc-700 px-7 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:border-white">English version</Link></div>
           </div>
           <Link href="/plugins" className="grid grid-cols-2 bg-zinc-900" aria-label="Ver catálogo de plugins VST3">
-            <div className="relative min-h-72"><Image src="/plugins/micmodeler.jpeg" alt="MicModeler plugin VST3 para voces" fill sizes="(max-width: 1024px) 50vw, 22vw" className="object-cover" /></div>
-            <div className="relative min-h-72"><Image src="/plugins/pure-type.jpeg" alt="Pure Type finalizador vocal VST3" fill sizes="(max-width: 1024px) 50vw, 22vw" className="object-cover" /></div>
+            <div className="relative min-h-72 lg:min-h-60"><Image src="/plugins/micmodeler.jpeg" alt="MicModeler plugin VST3 para voces" fill sizes="(max-width: 1024px) 50vw, 190px" className="object-cover" /></div>
+            <div className="relative min-h-72 lg:min-h-60"><Image src="/plugins/pure-type.jpeg" alt="Pure Type finalizador vocal VST3" fill sizes="(max-width: 1024px) 50vw, 190px" className="object-cover" /></div>
           </Link>
         </div>
       </section>

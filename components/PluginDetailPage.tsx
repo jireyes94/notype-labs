@@ -95,19 +95,19 @@ export default function PluginDetailPage({ plugin, locale }: { plugin: AudioPlug
   return (
     <main lang={locale === "en" ? "en" : "es"} className="min-h-screen bg-black px-5 pb-32 pt-28 text-white md:px-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
-      <div className="mx-auto max-w-[1500px]">
+      <div className="mx-auto max-w-[1120px]">
         <nav aria-label="Breadcrumb" className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <Link href={`${prefix}/plugins`} className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white">← {ui.back}</Link>
           <Link href={`${alternatePrefix}/plugins/${plugin.slug}`} hrefLang={locale === "es" ? "en" : "es"} className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white">{ui.language} →</Link>
         </nav>
 
-        <header className="grid overflow-hidden rounded-[2rem] border border-zinc-900 bg-zinc-950/60 lg:grid-cols-[1.05fr_0.95fr]">
+        <header className="grid overflow-hidden rounded-[2rem] border border-zinc-900 bg-zinc-950/60 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="relative aspect-square min-h-[360px] overflow-hidden bg-zinc-900 lg:aspect-auto">
-            <Image src={plugin.image} alt={`${plugin.name} ${plugin.tagline} VST3 plugin interface`} fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover" priority />
+            <Image src={plugin.image} alt={`${plugin.name} ${plugin.tagline} VST3 plugin interface`} fill sizes="(max-width: 1024px) 100vw, 460px" className="object-cover" priority />
           </div>
-          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-10">
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-red-600">{copy.eyebrow}</p>
-            <h1 className="mt-5 text-6xl font-black uppercase italic leading-[0.84] tracking-tighter md:text-8xl">{plugin.name}</h1>
+            <h1 className="mt-5 text-6xl font-black uppercase italic leading-[0.84] tracking-tighter md:text-8xl lg:text-6xl">{plugin.name}</h1>
             <p className="mt-6 text-xl font-black uppercase italic tracking-tight text-zinc-300 md:text-2xl">{copy.headline}</p>
             <p className="mt-6 text-sm leading-relaxed text-zinc-400 md:text-base">{copy.shortDescription}</p>
             <div className="mt-9 flex items-end justify-between gap-5 border-t border-zinc-800 pt-7">
@@ -142,8 +142,8 @@ export default function PluginDetailPage({ plugin, locale }: { plugin: AudioPlug
           <div className="mt-10 grid gap-4 md:grid-cols-3">{copy.faq.map((item) => <article key={item.question} className="rounded-3xl border border-zinc-900 p-7"><h3 className="text-lg font-black uppercase italic tracking-tight">{item.question}</h3><p className="mt-4 text-sm leading-relaxed text-zinc-500">{item.answer}</p></article>)}</div>
         </section>
 
-        <section className="grid overflow-hidden rounded-[2rem] border border-zinc-900 bg-zinc-950/60 md:grid-cols-[0.7fr_1.3fr]">
-          <Link href={`${prefix}/plugins/${related.slug}`} className="relative aspect-square overflow-hidden"><Image src={related.image} alt={`${related.name} VST3 plugin`} fill sizes="(max-width: 768px) 100vw, 35vw" className="object-cover transition-transform duration-700 hover:scale-[1.025]" /></Link>
+        <section className="mx-auto grid max-w-[960px] overflow-hidden rounded-[2rem] border border-zinc-900 bg-zinc-950/60 md:grid-cols-[0.7fr_1.3fr]">
+          <Link href={`${prefix}/plugins/${related.slug}`} className="relative aspect-square overflow-hidden"><Image src={related.image} alt={`${related.name} VST3 plugin`} fill sizes="(max-width: 768px) 100vw, 315px" className="object-cover transition-transform duration-700 hover:scale-[1.025]" /></Link>
           <div className="flex flex-col justify-center p-8 md:p-12"><p className="text-[10px] font-black uppercase tracking-[0.35em] text-red-600">{ui.related}</p><h2 className="mt-4 text-5xl font-black uppercase italic tracking-tighter">{related.name}</h2><p className="mt-5 max-w-2xl text-sm leading-relaxed text-zinc-400">{related.copy[locale].shortDescription}</p><Link href={`${prefix}/plugins/${related.slug}`} className="mt-7 w-fit rounded-full border border-zinc-700 px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:border-white">{ui.relatedAction} →</Link></div>
         </section>
 
