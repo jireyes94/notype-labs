@@ -16,6 +16,7 @@ export default function Navbar() {
   const visibleItemCount = isHydrated ? itemCount : 0;
 
   const links = [
+    { name: "Plugins", path: "/plugins" },
     { name: "Géneros", path: "/generos" },
     { name: "Guías", path: "/guias" },
     { name: "Licencias", path: "/licenses" },
@@ -62,7 +63,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6 md:gap-10">
-          <div className="hidden gap-8 text-[10px] font-black uppercase tracking-[0.3em] md:flex">
+          <div className="hidden gap-6 text-[10px] font-black uppercase tracking-[0.25em] lg:flex">
             {links.map((link) => (
               <Link
                 key={link.path}
