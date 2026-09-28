@@ -16,8 +16,8 @@ export default function AboutPage() {
     name: "NOTYPE.LABS",
     url: SITE_URL,
     logo: `${SITE_URL}/og-image.jpg`,
-    description: "Tienda independiente de beats y licencias musicales para artistas de Argentina.",
-    areaServed: { "@type": "Country", name: "Argentina" },
+    description: "Tienda independiente de beats, licencias musicales y plugins de audio para artistas y productores.",
+    areaServed: "Worldwide",
     sameAs: ["https://instagram.com/notype.labs", "https://youtube.com/@notypelabs"],
   };
 
@@ -37,7 +37,7 @@ export default function AboutPage() {
           {[
             ["Producción", "Cada beat se presenta con su identidad, BPM, tonalidad y estilo para que la decisión empiece por la música."],
             ["Licencias", "Las opciones separan calidad de archivo y alcance comercial. El objetivo es que el artista sepa qué está comprando."],
-            ["Tecnología", "El catálogo, el reproductor, el pago y la entrega digital forman parte de una misma experiencia construida para la tienda."],
+            ["Tecnología", "El catálogo, los plugins de audio, el reproductor, el pago y la entrega digital forman parte de un mismo laboratorio creativo."],
           ].map(([title, copy]) => <article key={title} className="rounded-3xl border border-zinc-900 bg-zinc-950/50 p-8"><h2 className="text-2xl font-black uppercase italic tracking-tight">{title}</h2><p className="mt-5 text-sm leading-relaxed text-zinc-500">{copy}</p></article>)}
         </section>
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
           <a href="https://instagram.com/notype.labs" target="_blank" rel="noopener noreferrer" className="group rounded-3xl border border-zinc-900 p-8 transition-colors hover:border-red-600/60"><p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-600">Instagram</p><h2 className="mt-4 text-3xl font-black uppercase italic tracking-tighter">Proceso y novedades →</h2><p className="mt-4 text-sm text-zinc-500">Nuevas instrumentales y actividad de NOTYPE.LABS.</p></a>
         </section>
 
-        <div className="mt-16 flex flex-wrap justify-center gap-4"><Link href="/#catalogo" className="rounded-full bg-red-600 px-7 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-700">Escuchar beats</Link><Link href="/guias" className="rounded-full border border-zinc-700 px-7 py-3 text-[10px] font-black uppercase tracking-widest hover:border-white">Leer guías</Link></div>
+        <div className="mt-16 flex flex-wrap justify-center gap-4"><Link href="/#catalogo" className="rounded-full bg-red-600 px-7 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-700">Escuchar beats</Link><Link href="/plugins" className="rounded-full border border-zinc-700 px-7 py-3 text-[10px] font-black uppercase tracking-widest hover:border-white">Explorar plugins</Link><Link href="/guias" className="rounded-full border border-zinc-700 px-7 py-3 text-[10px] font-black uppercase tracking-widest hover:border-white">Leer guías</Link></div>
       </div>
     </main>
   );

@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'; // Importa tu cliente de supabase
 import { SITE_URL } from '@/lib/site';
 import { GENRES } from '@/lib/genres';
 import { GUIDES } from '@/lib/guides';
+import { AUDIO_PLUGINS } from '@/lib/plugins';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,11 +11,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
 
   // Páginas estáticas
-  const routes = ['', '/generos', '/guias', '/sobre-notype-labs', '/licenses', '/faq', '/contact', '/terms', '/privacy', '/refund'].map((route) => ({
+  const routes = ['', '/generos', '/guias', '/sobre-notype-labs', '/licenses', '/faq', '/contact', '/terms', '/privacy', '/refund', '/plugins', '/en/plugins'].map((route) => ({
     url: `${baseUrl}${route}`,
     changeFrequency: 'monthly' as const,
-    priority: route === '' ? 1 : ['/generos', '/licenses'].includes(route) ? 0.8 : 0.5,
+    priority: route === '' ? 1 : ['/generos', '/licenses', '/plugins', '/en/plugins'].includes(route) ? 0.8 : 0.5,
   }));
+
+  const pluginRoutes = AUDIO_PLUGINS.flatMap((plugin) => [
+    {
+      url: `${baseUrl}/plugins/${plugin.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+      alternates: { languages: { es: `${baseUrl}/plugins/${plugin.slug}`, en: `${baseUrl}/en/plugins/${plugin.slug}`, 'x-default': `${baseUrl}/en/plugins/${plugin.slug}` } },
+    },
+    {
+      url: `${baseUrl}/en/plugins/${plugin.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+      alternates: { languages: { es: `${baseUrl}/plugins/${plugin.slug}`, en: `${baseUrl}/en/plugins/${plugin.slug}`, 'x-default': `${baseUrl}/en/plugins/${plugin.slug}` } },
+    },
+  ]);
 
   const genreRoutes = GENRES.map((genre) => ({
     url: `${baseUrl}/generos/${genre.slug}`,
@@ -45,5 +61,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...routes, ...genreRoutes, ...guideRoutes, ...beatRoutes];
+  return [...routes, ...pluginRoutes, ...genreRoutes, ...guideRoutes, ...beatRoutes];
 }
