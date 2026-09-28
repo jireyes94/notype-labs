@@ -57,7 +57,7 @@ export default function PluginCatalogPage({ locale }: { locale: PluginLocale }) 
   return (
     <main lang={locale === "en" ? "en" : "es"} className="min-h-screen overflow-hidden bg-black px-5 pb-32 pt-32 text-white md:px-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
-      <div className="mx-auto max-w-[1500px]">
+      <div className="mx-auto max-w-[1100px]">
         <header className="relative border-b border-zinc-900 pb-16">
           <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-red-700/10 blur-[120px]" />
           <div className="relative max-w-5xl">
@@ -76,23 +76,23 @@ export default function PluginCatalogPage({ locale }: { locale: PluginLocale }) 
             <GumroadLink href={GUMROAD_CATALOG_URL} product="catalog" locale={locale} placement="catalog_header" className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 transition-colors hover:text-white">{ui.store} →</GumroadLink>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="mx-auto grid max-w-[900px] gap-6 lg:grid-cols-2">
             {AUDIO_PLUGINS.map((plugin) => {
               const copy = plugin.copy[locale];
               return (
                 <article key={plugin.slug} className="group overflow-hidden rounded-[2rem] border border-zinc-900 bg-zinc-950/60 transition-colors hover:border-red-600/50">
-                  <Link href={`${prefix}/plugins/${plugin.slug}`} className="relative block aspect-square overflow-hidden bg-zinc-900">
-                    <Image src={plugin.image} alt={`${plugin.name} ${plugin.tagline} VST3 plugin interface`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" priority={plugin.slug === "micmodeler"} />
+                  <Link href={`${prefix}/plugins/${plugin.slug}`} className="relative block aspect-square overflow-hidden bg-zinc-900 lg:aspect-[4/3]">
+                    <Image src={plugin.image} alt={`${plugin.name} ${plugin.tagline} VST3 plugin interface`} fill sizes="(max-width: 1024px) 100vw, 430px" className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" priority={plugin.slug === "micmodeler"} />
                     <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
                     <span className="absolute bottom-5 left-5 rounded-full border border-white/15 bg-black/50 px-4 py-2 text-[9px] font-black uppercase tracking-[0.25em] backdrop-blur-md">Windows · VST3</span>
                   </Link>
-                  <div className="p-7 md:p-9">
+                  <div className="p-7 md:p-9 lg:p-7">
                     <div className="flex items-start justify-between gap-5">
-                      <div><p className="text-[9px] font-black uppercase tracking-[0.3em] text-red-600">{copy.eyebrow}</p><h2 className="mt-3 text-4xl font-black uppercase italic tracking-tighter">{plugin.name}</h2></div>
+                      <div><p className="text-[9px] font-black uppercase tracking-[0.3em] text-red-600">{copy.eyebrow}</p><h2 className="mt-3 text-4xl font-black uppercase italic tracking-tighter lg:text-3xl">{plugin.name}</h2></div>
                       <p className="whitespace-nowrap text-xl font-black italic">USD {plugin.price}</p>
                     </div>
-                    <p className="mt-5 min-h-20 text-sm leading-relaxed text-zinc-400">{copy.shortDescription}</p>
-                    <div className="mt-8 flex flex-wrap gap-3">
+                    <p className="mt-5 min-h-20 text-sm leading-relaxed text-zinc-400 lg:min-h-0">{copy.shortDescription}</p>
+                    <div className="mt-8 flex flex-wrap gap-3 lg:mt-6">
                       <Link href={`${prefix}/plugins/${plugin.slug}`} className="rounded-full border border-zinc-700 px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:border-white">{ui.view}</Link>
                       <GumroadLink href={plugin.gumroadUrl} product={plugin.slug} locale={locale} placement="catalog_card" className="rounded-full bg-red-600 px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-colors hover:bg-red-700">{ui.buy}</GumroadLink>
                     </div>
